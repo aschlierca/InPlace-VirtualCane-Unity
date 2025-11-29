@@ -1,0 +1,6 @@
+Welcome to Material Learning Room! I’m your audio tour guide and I give you an introduction about this room.<br>
+In this room, you will learn about different sounds which you will come across during the game.<br>
+Please stay in place throughout the scene, you don’t need to move.<br>
+There are 3 interactable audio speakers on the ground, in front of you. They are in a line and at your 11 o’clock, 12 o’clock and 1 o’clock direction.<br>
+Each audio speaker contains the sound of a type of material, such as wood, metal<br>
+You may use the virtual cane to interact with them. When the cane hit<br>

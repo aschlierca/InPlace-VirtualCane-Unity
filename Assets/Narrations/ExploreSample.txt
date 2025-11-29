@@ -1,0 +1,30 @@
+Welcome to the Exploration Room! I’m your audio tour guide and I give you a layout description of this room.<br>
+This is a rectangle room. It's 9 meters long and 6 meters wide.<br>
+
+There are 4 walls in this room.<br>
+Right behind you is wall one. On your left hand side is wall two. In front of you is wall three. And on your right hand side is wall four.<br>
+Wall one and wall three are 9 meters long. Wall two and wall four are 6 meters.<br>
+
+There are 3 doors in this room.<br>
+Door one and door two are on wall one, and door three is on wall four.<br>
+Door one is right behind you.<br>
+
+There are six items in the room. I will introduce them based on their relative position to you from near to far.<br>
+A water machine is in your 3 o'clock direction. It's about half meters away from you.<br>
+A cardboard box is in your 11 o'clock direction. It's at the corner of wall two and three. It's about 5 meters away from you<br>
+A plastic chair is in your 1 o'clock direction. It's about 3 meters away from you.<br>
+A wood table is in your 2 o'clock direction. It's about 4 meters away from you.<br>
+A stone table is in your 3 o'clock direction. It's at the corner of wall one and wall four. It's about 8 meters away from you.<br>
+A metal table is in your 2 o'clock direction. It's around the corner of wall three and wall four. It's about 9 meters aways from you.<br>
+
+That's all of the descriptions about this room! Next, I'm going to tell you what your task is in this game room. <br>
+In short, you will explore this room and learn the 'position of objects' and 'layout of this room'. This includes learning 'the position of each object in this room' and 'relative position from one virtual object to another'. <br>
+The whole exploration consists by two parts: <br>
+In the 'first' part, we will use 'waypoints' to lead you on a round tour in this room. After the tour, you will come back to your starting position. <br>
+However, please keep in mind that 'your goal in this room is NOT finding waypoints'. Your goal is learning the objects and layout of this room. <br>
+So, on the way that you walk to a waypoint, feel free to 'stop' 'and' 'hits' the virtual objects around you. To learn about their 'sound', 'relative position' and 'shape'. <br>
+After having a 'round tour' by following the 'waypoints', you will hear something like 'navigation end'. When it's end, you can begin the 'second' part of this exploration game. <br>
+In this 'second' part, you can take '10' 'to' '15' minutes to have a 'free tour' in this room. No 'waypoints navigation' will be provided in this 'second' part. <br>
+During the 'free tour', please use the virtual cane to hit the virtual objects around. You can treat these objects as 'landmarks', so you can navigate yourself in this room. <br>
+Please use this 'free tour' to explore the objects you didn't find in the 'first' round. Also, you can 'review' the information of virtual objects you have learned during the 'first' round. <br>
+Alright! Have fun in this game room. The game will start right after this instruction session. Please hit the right panel again and follow the instructions to end this session. <br>

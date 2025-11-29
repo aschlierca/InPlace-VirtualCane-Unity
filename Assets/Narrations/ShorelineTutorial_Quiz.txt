@@ -1,0 +1,12 @@
+Welcome to the shorelining advanced tutorial.<br>
+
+In the previous 'shorelining beginner' tutorial. You have learned how to use shorelining to walk along the edge of a virtual object. You have walked along the 4 edges of a '3 by 3' rock cube. <br>
+In this game room. You will apply the 'shorelining techniques' you learned to deal with several 'more challenging' scenarios. <br>
+During the game. You will be asked to walk to a 'waypoint'. You will run into several obstacles on your way. And you need to use shorelining techniques to 'walk around' or 'circumvent' those obstacles. <br>
+
+As a hint. One of the obstacles you will meet is a 'wall'. In the beginning, you will facing towards that wall 'perpendicularly'. <br>
+When you are facing towards the wall. On your 'right hand side' direction. Along the wall. There will be an 'entrance'. <br>
+If you go through the entrance. You will get to the other side of the wall. <br>
+On the contrary. Along your 'left hand side' direction. The wall is infinitely long. So, please do not try to walk to your 'left hand side'. <br>
+In the game, you will be asked to walk along the wall to the 'right hand side' using shorelining. And go through that 'entrance'. <br>
+You will figure out why when you are in the game soon. Awesome! Let's give it a try now! The game will start right after this instruction session. Please hit the right panel again and follow the instructions to end this session. <br>

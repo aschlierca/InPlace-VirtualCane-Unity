@@ -1,0 +1,33 @@
+Welcome to the waypoint walk tutorial.<br>
+Before starting this exercise, please make sure there is a 6 meters long and wide, rectangle open area, in front of you. <br>
+
+In last exercise, you have learned and practiced the techniques for finding the direction of a waypoint.<br>
+In this session, you will be asked to find the direction of 5 randomly generated waypoints and walk to it.<br>
+Don't worry, these 5 waypoints will be generated within the rectangle open area in front of you, so you won't bump into any obstacles.<br>
+These 5 waypoints will be generated one-by-one in sequence. Only after you arrive at one waypoint, the next waypoint will be activated. So you won't hear duplicated drum beat sound.<br>
+By walking to these waypoints one by one, you are walking on a predefined route. The route is like a bus line, and the waypoints are the stops on it. <br>
+
+When your body hits a virtual waypoint, you will hear success sound, like this:<br>
+Once you successfully hits a waypoint, it will disappear, and the next waypoint will appear.<br>
+Then, the drum beat 3D music will play from the next waypoint in the route.<br>
+Just to recap, the drum beat 3D music emitted from an active waypoint sounds like: <br>
+When your face is facing towards an active waypoint, the drum beat 3D music will become much faster, and it will sound like: <br>  
+
+Now, I'm going to share with you a useful technique about how to efficiently walk to a waypoint. <br>
+First of all, make sure you always walk to the direction where you can continuously hear fast drum beat music. <br>
+Secondly, if the drum beat sound slows down suddenly, it means your face is no longer in the direction of that way point. <br>
+When that happens, you should stop walking right away. Then you should start to rotate your head and body to correct your forwarding direction. <br>
+Lastly, when you find a direction where you can continuously hear the fast drum beat music again, you can start to walk in that direction. <br>
+It's not too hard, right? <br>
+
+During the game, if you barely move for 20 seconds, the system will automatically give you a hint about the direction and position of the way point. <br> 
+The hint will sound like "the way point is at 2 o'clock direction of your face. It's 2 meters away from you." <br>
+However, don't follow the hints without any validation by yourself! Because the hint only gives rough directions. <br>
+After listening to the hints, please use the "fast drum beat music technique" to double check, and find the correct direction. <br> 
+
+Cool! By the way, I think you might be curious why you need to practice this. <br>
+It is because, in the other virtual rooms of this App, we will use this "waypoints route" to show you an empty pathway between obstacles. <br>
+By following the predefined "waypoints route", you will be able to have a tour in the virtual room without colliding into any virtual objects. <br> 
+So, the more you are familiar with the technique of walking toward waypoints, you will feel more comfortable when exploring the other virtual rooms. <br>
+
+Alright, let's give it a try now! The exercise will start right after this instruction session. Please hit the right panel again and follow the instructions to end this session. <br>

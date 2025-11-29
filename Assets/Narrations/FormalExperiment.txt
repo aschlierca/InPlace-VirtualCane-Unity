@@ -1,0 +1,36 @@
+Welcome to the Experiment Room! I’m your audio guide. I will give you a layout description of this room. I will also introduce you the tasks you need to do in this room <br>
+This is a rectangle room. It's 30 feet long and 15 feet wide.<br>
+
+There are 4 walls in this room.<br>
+Right behind you is wall one. On your left hand side is wall two. In front of you is wall three. And on your right hand side is wall four.<br>
+Wall one and wall three are 30 feet long. Wall two and wall four are 15 feet.<br>
+When you hit walls you will hear sound: <br>
+
+There are 3 doors in this room.<br>
+Door one and door two are on wall one, and door three is on wall four.<br>
+Door one is right behind you.<br>
+Door two is on your right. At your 3 and half o'clock direction. It's about 15 feet away from you. <br>
+Door three is on your right. At your 2 o'clock direction. It's about 26 feet away from you. <br>
+When you hit doors you will hear sound: <br>
+
+There are 'eight' items in the room. I will introduce them based on their relative position to you from near to far.<br>
+A trash can is on your left. At your 9 o'clock direction. It's at the corner of wall 1 and wall 2. It's about 4 feet away from you. When you hit it, you will hear sound: <br>
+A visitor chair is on your left. At your 11 o'clock direction. It's close to wall 2. It's about 7 feet away from you. When you hit it, you will hear sound:<br>
+A wood table is on your right. At your 2 o'clock direction. It's in the middle of the room. It's about 8 feet away from you. When you hit it, you will hear sound:<br>
+A host chair is on your right. At your 2 o'clock direction. It's next to the wood table. It's about 11 feet away from you. When you hit it, you will hear sound:<br>
+A file cabinet is in front of you. At your 12 and half o'clock direction. It's close to wall 3. It's about 12 feet away from you. When you hit it, you will hear sound:<br>
+A plant pot is on your left. At your 11 o'clock direction. It's at the corner of wall 2 and wall 3. It's about 13 feet away from you. When you hit it, you will hear sound:<br>
+A book shelf is on your right. At your 1 and half o'clock direction. It's around the corner of wall 3 and wall 4. It's about 19 feet away from you. When you hit it, you will hear sound:<br>
+A cardboard box is on your right. At your 3 o'clock direction. It's at the corner of wall 4 and wall 1. It's about 22 feet away from you. When you hit it, you will hear sound:<br>
+
+That's all of the descriptions about this room! Next, I'm going to tell you what your task is in this game room. <br>
+In short, you will explore this room and learn the 'position of objects' and 'layout of this room'.<br>
+It includes learning 'the position of each object in this room' and 'relative position from one virtual object to another'. <br>
+We will ask several follow-up questions related to the layout of the room after your exploration.<br>
+You will have 10 minutes to explore this room and acquire information as much as you can!<br>
+When exploring the room for the first time, we recommend you using the 'perimeter' strategy. <br>
+It means, you need to fristly find a 'nearby corner'. Then, walking along the edge of 4 walls one-by-one. <br>
+Just to recap, the trash can is on your left, 9 o'clock direction. It's 4 feets from you, and it's at the corner of wall1 and wall2. So you can start your 'perimeter' tour from there. <br>
+After finishing the tour using 'perimeter' method, you will come back to your starting position. Then, you can freely explore the room using any strategy you prefer. <br>
+
+Alright! Have fun in this game room. The game will start right after this instruction session. Please hit the right panel again and follow the instructions to end this session. <br>

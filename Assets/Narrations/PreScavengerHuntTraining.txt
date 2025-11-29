@@ -1,0 +1,7 @@
+Welcome to the scavenger hunt game training.    <br>
+This is a complex room, in this room you will meed multiple tricky scenarios, but don’t worry, feel free to ask instructor.<br>
+In this training, you need to follow the drum beat to find the waypoints. <br>
+There are three types of floors in the game. each type of floor will give you different feedback when you use your virtual cane to hit or slide on the floor.   <br>
+The floor inside of the corridor is carpet, the navigation road to the door of the corridor is made by brick. And the rest of the floor is made by wood.<br>
+And there are multiple hazard boxes on the floor. when you hit the hazard box, it will give you the warning feedback to tell you are close to the wall.    <br>
+Now you are at the start point inside of the corridor. try to find the exit of the corridor and then follow the brick floor to find the treasure.   <br>

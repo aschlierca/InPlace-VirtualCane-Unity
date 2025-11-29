@@ -1,0 +1,17 @@
+Welcome to Tutorial room 2. This is the second part of the tutorial. <br>
+To complete this tutorial section, you need to explore a room of irregular shape and find the door to exit. <br>
+
+Inside of this room, we placed three way points. <br> 
+The way points will play navigation music to guide you to the different areas of the room. <br>
+The navigation music will sound like drum beats. <br>
+Once you reach one of the way points, you will hear a bling sound. <br>
+The way point which you reached will disappear, and the next waypoint will appear. <br>
+The navigation sound will start to emit from the next waypoint. <br>
+
+Also, there are some virtual objects in this room, you can use your virtual cane to explore them. <br>
+All these things are virtual, you will not be trapped by any objects. <br>
+The support staff will keep you safe throughout the entire learning process. <br>
+If you feel uncomfortable, please contact the support staff immediately. <br>
+
+You are now in your starting point, let the game begin! <br>
+The first waypoint is at your 11 o' clock direction, please try to follow the navigation sound to find it. <br>

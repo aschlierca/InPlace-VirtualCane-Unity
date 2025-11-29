@@ -1,0 +1,41 @@
+Welcome to the shorelining beginner tutorial.<br>
+In this session, I will go over 3 things. First, what is shorelining technique. Second, how to do shorelining in this App. Third, your training objective in this tutorial. <br>
+
+Firstly, let's talk about the shorelining technique in the real-world. <br>
+You might have already learned about this technique in your orientation and mobility training courses. If you have never learned about this before, no worry. We will explain this technique in detail to help you understand. <br>
+Shorelining is a technique used to find a landmark or particular destination when you travel with a white cane. <br>
+Imagine yourself on a sidewalk, and on your way back to your house. On your right hand side, it's a grass lawn. <br>
+To reach your house, you need to walk on that sidewalk, towards your front for 30 feet, and then turn right to the pathway of your house. The grass lawn will end when the pathway shows up. <br>
+So, the question is - what cane technique could you use to make sure you are walking toward the correct direction and turn to your right at the correct moment? <br>
+Exactly! Shorelining can be used here. In our scenario, the 'grassline' between the sidewalk and grass lawn can be treated as a shoreline. You can walk parallel to the grassline to ensure that the direction is correct! <br>
+To walk parallel to it, you will touch the floor in front of you with your cane. And constantly slide it from 'right to left', then 'left to right' to touch down several inches over each side of the shoreline's edge. <br>
+Let's say the 'sidewalk' is made of 'stone'. If you walk along the grassline using the shorelining technique, you will feel the sliding patterns are 'stone' 'to' 'grass' and then 'grass' 'to' 'stone'. <br>
+If your 'pathway' is also made of 'stone'. When you reach the place to turn to your right, you will feel the sliding pattern changes to 'stone' 'to' 'stone'. It is because your cane touches the pathway of your house. <br>
+Alright, the example above is how to use the shorelining technique to walk along a shoreline in the real-world. <br>
+
+Here is the 'second' part. I guess you might be curious why you need to do shorelining when using this App. <br>
+It is because - when you are exploring a virtual room in this App, you sometimes will find a virtual object lies in between 'you' and 'your destination'. <br>
+An example is - you hear the 'waypoint drum beat sound' on your right, but when you turn to your right, your cane touches a 'virtual obstacle'. <br>
+When this happens, you need to find the 'edge' of that obstacle. Treating that 'edge' as a 'shoreline'. And, using shorelining to walk parallel to the 'edge' and circumvent the obstacle. <br>
+In this App, you won't receive any physical feedback like what you do in the real-world. So, you will do shorelining based on pure audio feedback. <br>
+Just like doing shorelining in the real world - to do shorelining in this app, you also need to constantly slide your cane from 'right to left' and 'left to right' to identify the change of sliding pattern. <br>
+If you remember, when your cane touches the inside of an object, you will hear 'vibration sound', like this: <br>
+When your cane slides on the virtual wood floor, you will hear 'wood floor sliding sound', like this: <br>
+To walk along the edge of an virtual object, you need to find a 'sliding pattern' of 'floor to vibration', and then 'vibration to floor'. <br>
+To catch this 'sliding pattern', you need to 'slide' your cane from 'floor' 'to' 'inside of an virtual object', and then 'slide back' to 'floor'. <br>
+If you walk along the edge of the virtual obstacle using shorelining, you will continuously hear sound like: <br>
+While you do shorelining, if you found that the 'cane sliding pattern' changes to 'floor' 'to' 'floor', it means you have successfully completed 'walking along one edge of an object'. <br>
+At that point, if you wish to 'walk along another edge', you can turn to your 'left' 'or' 'right' to find a direction, where the 'floor' 'to' 'vibration', or 'vibration' 'to' 'floor' pattern appears again. <br>
+Soon, you will learn this in detail in the virtual tutorial room after the instruction session. <br>
+
+Here is the 'third' part. I will introduce you to the layout of the tutorial room that you will enter soon, and your task in that room. <br>
+This is a virtual room without any 'virtual wall', and the only object in this room is a large virtual cube 'made of rock'. <br>
+The 'rock cube' will be in the middle of the room. It's '10 feet wide', '10 feet long', and '10 feet tall'. <br>
+The cube is placed on the floor. And on the surface which the cube intersects with the floor, there are 4 corners. <br>
+Calling out the names of corners in a 'counter-clockwise' order, they are 'SouthEast', 'NorthEast', 'NorthWest' and 'SouthWest' corners. <br>
+One 'side of the cube' connects each two corners. You can imagine it as a 'wall'. <br>
+For example, 'East Side of Cube' connects the 'SouthEast' and 'NorthEast' corners. 'North Side of Cube' connects the 'NorthEast' and 'NorthWest' corners. <br>
+When the game starts, you will stand beside the 'SouthEast' corner, and face towards the 'NorthEast' corner. The 'East Side of Cube' is on your left hand side. <br>
+In the beginning, an 'in game instruction' will lead you to do one shorelining step-by-step. Please follow the instructions by that time. <br>
+Afterwards, you will be asked to use the shorelining technique to walk along the '4 sides' of the cube, and reach all corners one-by-one. Once you reach all of them, this tutorial will be finished. <br>
+Awesome! Let's give it a try now! The exercise will start right after this instruction session. Please hit the right panel again and follow the instructions to end this session. <br>

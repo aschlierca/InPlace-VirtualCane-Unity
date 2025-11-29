@@ -1,0 +1,4 @@
+Welcome    to Example!    <br>
+I’m your tester.    <br> 
+Let's test the instruction manager.<br>
+Hooray!<br>

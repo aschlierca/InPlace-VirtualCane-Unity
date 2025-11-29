@@ -1,0 +1,22 @@
+Welcome to the way point direction tutorial.<br>
+In this session, I will teach you what is way point, and how to identify the direction of a way point.<br>
+A way point is an intermediate point on a route. You can imagine it as a stop on a bus line. Several consecutive way points make up a route.<br>
+
+In a game, a drum beat 3D music will be played from the active way point. It sounds like: <br>
+Since it's 3D music. In a game, you can figure out the direction where the music comes from.<br>
+When you hear the drum beat music, try to rotate your head to your left, and then to your right. <br>
+By doing this, you will hear the volume of music in your left and right ear changes.<br>
+After that, try to turn to the direction where the volume of the music is higher.<br>
+When your face is facing toward the direction of music, both of your ears will hear music of the same volume. <br>
+At the same time, the drum beat music will become very fast. It will sound like: <br>
+
+Great! In the upcoming game, you will practice these direction identifying techniques. <br>
+You will stand at where you are at now, and random way points will be generated around you for 6 times.<br>
+Each time, try to use the techniques above to find the direction of that point. <br>
+Once you find it, keep your face facing towards that direction for 1 second to confirm. <br>
+During that 1 second of confirmation period, you will continuously hear rapid drum beat 3D music. <br>
+When it's confirmed, you will hear music like: <br>
+
+Lastly, please note again - you 'DO NOT' need to move or use your virtual cane for the upcoming game! <br>
+You only to stand at your current position. Then, rotating your head and body to different directions, where the waypoint sounds come from. <br>
+Alright, let's give it a try now! The exercise will start right after this instruction session. Please hit the right panel again and follow the instructions to end this session. <br>
