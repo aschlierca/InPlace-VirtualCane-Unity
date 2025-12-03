@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using MoreMountains.NiceVibrations;
+//using MoreMountains.NiceVibrations;
 using UnityEngine.SceneManagement;
 
 public class LayoutLearner : MonoBehaviour
@@ -14,7 +14,7 @@ public class LayoutLearner : MonoBehaviour
 
     private VerbalManager_General verbalManager_General;    // The class controls text to speech
 
-    private VibrationManager_Feedback vibrationManagerFb;
+    //private VibrationManager_Feedback vibrationManagerFb;
 
     private string objName;
 
@@ -38,7 +38,7 @@ public class LayoutLearner : MonoBehaviour
     {
         mainMenu = "MainMenu";          // initialize the mainMenu variable
         verbalManager_General = GameObject.Find("SoundBall").GetComponent<VerbalManager_General>();
-        vibrationManagerFb = GameObject.Find("SoundBall").GetComponent<VibrationManager_Feedback>();
+        //vibrationManagerFb = GameObject.Find("SoundBall").GetComponent<VibrationManager_Feedback>();
 
         //SpeakFeedbackVerbal(instructions);
         try
@@ -83,7 +83,7 @@ public class LayoutLearner : MonoBehaviour
                         source = lastSelectedObject.GetComponent<AudioSource>();
                         if (source)
                             source.Stop();
-                        MMVibrationManager.StopAllHaptics();
+                        //MMVibrationManager.StopAllHaptics();
                         Renderer lastRenderer = lastSelectedObject.GetComponent<Renderer>();
                         if (lastRenderer != null)
                         {
@@ -102,7 +102,7 @@ public class LayoutLearner : MonoBehaviour
                     {
                         objName = name;
                         SpeakFeedbackVerbal(name);
-                        MMVibrationManager.ContinuousHaptic(1f, 1f, 0.1f, HapticTypes.Failure, this, true);
+                        //MMVibrationManager.ContinuousHaptic(1f, 1f, 0.1f, HapticTypes.Failure, this, true);
                     }
                     Renderer objectRenderer = selectedObject.GetComponent<Renderer>();
                     if (objectRenderer != null)
@@ -129,24 +129,24 @@ public class LayoutLearner : MonoBehaviour
 #if UNITY_EDITOR
         if (Input.GetMouseButtonDown(0))
         {
-           
+
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
-            
+
             if (Physics.Raycast(ray, out hit))
             {
-                
+
                 GameObject selectedObject = hit.collider.gameObject;
 
-                
+
                 Debug.Log("Clicked on: " + selectedObject.name);
 
-                
+
                 if (lastSelectedObject != null)
                 {
                     source = lastSelectedObject.GetComponent<AudioSource>();
-                    if(source)
+                    if (source)
                         source.Stop();
                     Renderer lastRenderer = lastSelectedObject.GetComponent<Renderer>();
                     if (lastRenderer != null)
@@ -155,7 +155,7 @@ public class LayoutLearner : MonoBehaviour
                     }
                 }
 
-                
+
                 source = selectedObject.GetComponent<AudioSource>();
                 if (source)
                     source.Play();
@@ -167,7 +167,7 @@ public class LayoutLearner : MonoBehaviour
                     objectRenderer.material.color = Color.red;
                 }
 
-                
+
                 lastSelectedObject = selectedObject;
             }
         }
