@@ -34,6 +34,9 @@ public class StepCount : MonoBehaviour
     private int displayedSteps = 0;
     void Start()
     {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
         StartStepCounter();  // begin iOS step counting
         displayedSteps = 0;
         UpdateStepUI();
