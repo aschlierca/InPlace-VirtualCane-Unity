@@ -1412,6 +1412,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SettingManager
       objectReference: {fileID: 0}
+    - target: {fileID: 6549516009925349709, guid: 19b8cc28151bb4857b82ff039e9cd9cd, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7758297415438733503, guid: 19b8cc28151bb4857b82ff039e9cd9cd, type: 3}
       propertyPath: m_RootOrder
       value: 18
