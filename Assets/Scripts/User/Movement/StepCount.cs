@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 
 public class StepCount : MonoBehaviour
 {
+    private bool manualOverride = false;
 #if UNITY_IOS && !UNITY_EDITOR
     [DllImport("__Internal")]
     private static extern void StartStepCounter();
@@ -15,7 +16,7 @@ public class StepCount : MonoBehaviour
     // Editor-safe mock functions
     private static void StartStepCounter()
     {
-        Debug.Log("StartStepCounter() called — iOS only.");
+        //Debug.Log("StartStepCounter() called — iOS only.");
     }
 
     private static int GetStepCount()
@@ -29,13 +30,14 @@ public class StepCount : MonoBehaviour
 
     [Header("Player to Move")]
     public Transform player;
-    public float stepDistance = 0.1f; // how far the player moves per step
+    [SerializeField] public float stepDistance = 1f; // how far the player moves per step
 
     private int displayedSteps = 0;
     void Start()
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+
 
         StartStepCounter();  // begin iOS step counting
         displayedSteps = 0;
@@ -45,32 +47,38 @@ public class StepCount : MonoBehaviour
     void Update()
     {
 #if UNITY_IOS && !UNITY_EDITOR
-        int realSteps = GetStepCount();
-        if (realSteps != displayedSteps)
-        {
-            // Move forward based on REAL step increases
-            int diff = realSteps - displayedSteps;
-            MovePlayer(diff);
+    if (manualOverride) return;
 
-            displayedSteps = realSteps;
-            UpdateStepUI();
-        }
+    int realSteps = GetStepCount();
+    if (realSteps != displayedSteps)
+    {
+        int diff = realSteps - displayedSteps;
+        MovePlayer(diff);
+        displayedSteps = realSteps;
+        UpdateStepUI();
+    }
 #endif
     }
 
     // ---------- UI Buttons ----------
     public void AddStep()
     {
+        manualOverride = true;
         displayedSteps++;
         MovePlayer(+1);
         UpdateStepUI();
+
+        manualOverride = false;
     }
 
     public void SubtractStep()
     {
+        manualOverride = true;
         displayedSteps = Mathf.Max(0, displayedSteps - 1);
         MovePlayer(-1);
         UpdateStepUI();
+
+        manualOverride = false;
     }
 
     // ---------- Helper Functions ----------
@@ -88,5 +96,11 @@ public class StepCount : MonoBehaviour
         {
             player.Translate(Vector3.forward * stepDistance * steps);
         }
+    }
+
+    void LateUpdate()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 }

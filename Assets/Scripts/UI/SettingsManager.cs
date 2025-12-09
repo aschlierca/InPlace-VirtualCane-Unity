@@ -12,10 +12,11 @@ public class SettingsManager : MonoBehaviour
 
     [Header("Settings Config")]
     // How much the slider moves per click (0.1 = 10%)
-    public float stepSize = 0.1f; 
-    
+    public float scaleSize = 0.1f;
+    private StepCount stepCount;
+
     // Default height in inches (5'8" = 68 inches)
-    private int currentHeightInches = 68; 
+    private int currentHeightInches = 68;
 
     void Start()
     {
@@ -27,45 +28,47 @@ public class SettingsManager : MonoBehaviour
 
         // 2. Refresh the text display
         UpdateHeightDisplay();
+
+        stepCount = GetComponent<StepCount>();
     }
 
     // ---------------- VOLUME CONTROLS ---------------- //
     public void VolumeUp()
     {
-        volumeSlider.value += stepSize;
+        volumeSlider.value += scaleSize;
         SaveSettings();
     }
 
     public void VolumeDown()
     {
-        volumeSlider.value -= stepSize;
+        volumeSlider.value -= scaleSize;
         SaveSettings();
     }
 
     // ---------------- HAPTICS CONTROLS ---------------- //
     public void HapticsUp()
     {
-        hapticsSlider.value += stepSize;
+        hapticsSlider.value += scaleSize;
         Handheld.Vibrate(); // Physical feedback!
         SaveSettings();
     }
 
     public void HapticsDown()
     {
-        hapticsSlider.value -= stepSize;
+        hapticsSlider.value -= scaleSize;
         SaveSettings();
     }
 
     // ---------------- SENSITIVITY CONTROLS ---------------- //
     public void SensitivityUp()
     {
-        sensitivitySlider.value += stepSize;
+        sensitivitySlider.value += scaleSize;
         SaveSettings();
     }
 
     public void SensitivityDown()
     {
-        sensitivitySlider.value -= stepSize;
+        sensitivitySlider.value -= scaleSize;
         SaveSettings();
     }
 
@@ -74,6 +77,7 @@ public class SettingsManager : MonoBehaviour
     {
         currentHeightInches++;
         UpdateHeightDisplay();
+        stepCount.stepDistance = 0.415f * currentHeightInches; // Update step distance based on new height
         SaveSettings();
     }
 
@@ -81,6 +85,8 @@ public class SettingsManager : MonoBehaviour
     {
         currentHeightInches--;
         UpdateHeightDisplay();
+        stepCount.stepDistance = 0.415f * currentHeightInches; // Update step distance based on new height
+
         SaveSettings();
     }
 
@@ -89,7 +95,7 @@ public class SettingsManager : MonoBehaviour
     {
         // Math: 68 inches / 12 = 5 feet
         int feet = currentHeightInches / 12;
-        
+
         // Math: 68 inches % 12 = 8 remainder (inches)
         int inches = currentHeightInches % 12;
 
