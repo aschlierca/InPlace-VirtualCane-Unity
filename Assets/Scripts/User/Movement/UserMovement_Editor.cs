@@ -131,11 +131,11 @@ public class UserMovement_Editor : MonoBehaviour
             /* Using WASD to control User body's translation */
 
             moveStep = Vector3.zero;
-            if (Input.GetKey(KeyCode.W))
+            if (Input.GetKey(KeyCode.R))
             {
                 moveStep = Vector3.forward * updatedMoveSpeed * Time.deltaTime;
             }
-            if (Input.GetKey(KeyCode.S))
+            if (Input.GetKey(KeyCode.F))
             {
                 moveStep = Vector3.back * updatedMoveSpeed * Time.deltaTime;
             }
@@ -226,11 +226,11 @@ public class UserMovement_Editor : MonoBehaviour
         // --- 2. Vertical Rotation (Grip Point) ---
         // gripRot.x -= Input.GetAxis("Mouse Y") * sensitivity; // <--- Old Mouse Code
 
-        if (Input.GetKey(KeyCode.R))
+        if (Input.GetKey(KeyCode.W))
         {
             gripRot.x -= rotSpeed * Time.deltaTime; // Tilt Up
         }
-        if (Input.GetKey(KeyCode.F))
+        if (Input.GetKey(KeyCode.S))
         {
             gripRot.x += rotSpeed * Time.deltaTime; // Tilt Down
         }
