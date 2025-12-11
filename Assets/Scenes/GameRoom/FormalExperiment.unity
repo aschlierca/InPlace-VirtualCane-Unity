@@ -10006,23 +10006,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3829219949890631879, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.9
+      value: 0.68
       objectReference: {fileID: 0}
     - target: {fileID: 3829219949890631879, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.4
+      value: 0.769
       objectReference: {fileID: 0}
     - target: {fileID: 3829219949890631879, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.988693
+      value: 0.94157606
       objectReference: {fileID: 0}
     - target: {fileID: 3829219949890631879, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.14995372
+      value: 0.33680055
       objectReference: {fileID: 0}
     - target: {fileID: 3829219949890631879, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 17.248
+      value: 39.364
       objectReference: {fileID: 0}
     - target: {fileID: 3829219949890631897, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
       propertyPath: m_Enabled
@@ -10034,7 +10034,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3829219949890631897, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
       propertyPath: field of view
-      value: 117
+      value: 91
+      objectReference: {fileID: 0}
+    - target: {fileID: 3829219949890631897, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
+      propertyPath: m_FOVAxisMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3829219949890631897, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
+      propertyPath: m_FocalLength
+      value: 50.000008
       objectReference: {fileID: 0}
     - target: {fileID: 3829219949890631897, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
       propertyPath: m_TargetDisplay
@@ -10044,6 +10052,10 @@ PrefabInstance:
       propertyPath: m_TargetTexture
       value: 
       objectReference: {fileID: 8400000, guid: b1a302d58f1774aa5a2491a1d1c11075, type: 2}
+    - target: {fileID: 3829219949890631897, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
+      propertyPath: m_projectionMatrixMode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3829219949890631897, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
       propertyPath: m_NormalizedViewPortRect.x
       value: 0
@@ -10100,6 +10112,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8147116427435252234, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
+      propertyPath: m_Constraints
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8231010899323908372, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -10132,6 +10148,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3829219949890631876, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1741581288}
+    - targetCorrespondingSourceObject: {fileID: 3829219949890631876, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1741581296}
   m_SourcePrefab: {fileID: 100100000, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
 --- !u!1 &1741581285 stripped
 GameObject:
@@ -10187,6 +10206,21 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3829219949517064340, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
   m_PrefabInstance: {fileID: 1741581284}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1741581296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1741581286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69307f6693cf143e9af02aaa76cdcd7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerBody: {fileID: 1741581289}
+  mouseSensitivity: 2
+  touchSensitivity: 0.2
 --- !u!1 &1752145540
 GameObject:
   m_ObjectHideFlags: 0

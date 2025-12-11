@@ -1,11 +1,9 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 using System.Runtime.InteropServices;
 
 public class StepCount : MonoBehaviour
 {
-    private bool manualOverride = false;
 #if UNITY_IOS && !UNITY_EDITOR
     [DllImport("__Internal")]
     private static extern void StartStepCounter();
@@ -13,16 +11,8 @@ public class StepCount : MonoBehaviour
     [DllImport("__Internal")]
     private static extern int GetStepCount();
 #else
-    // Editor-safe mock functions
-    private static void StartStepCounter()
-    {
-        //Debug.Log("StartStepCounter() called — iOS only.");
-    }
-
-    private static int GetStepCount()
-    {
-        return 0;
-    }
+    private static void StartStepCounter() { }
+    private static int GetStepCount() { return 0; }
 #endif
 
     [Header("UI")]
@@ -30,77 +20,63 @@ public class StepCount : MonoBehaviour
 
     [Header("Player to Move")]
     public Transform player;
-    [SerializeField] public float stepDistance = 1f; // how far the player moves per step
+    [SerializeField] public float stepDistance = 1f;
 
-    private int displayedSteps = 0;
+    private int realSteps = 0;     // from pedometer
+    private int manualSteps = 0;   // from buttons
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-
-        StartStepCounter();  // begin iOS step counting
-        displayedSteps = 0;
+        StartStepCounter();
         UpdateStepUI();
     }
 
     void Update()
     {
 #if UNITY_IOS && !UNITY_EDITOR
-    if (manualOverride) return;
+        int newRealSteps = GetStepCount();
+        int diff = newRealSteps - realSteps;
 
-    int realSteps = GetStepCount();
-    if (realSteps != displayedSteps)
-    {
-        int diff = realSteps - displayedSteps;
-        MovePlayer(diff);
-        displayedSteps = realSteps;
-        UpdateStepUI();
-    }
+        if (diff > 0)
+        {
+            realSteps = newRealSteps;
+            MovePlayer(diff);
+            UpdateStepUI();
+        }
 #endif
     }
 
-    // ---------- UI Buttons ----------
+    // ---------- Buttons ----------
     public void AddStep()
     {
-        manualOverride = true;
-        displayedSteps++;
-        MovePlayer(+1);
+        manualSteps++;
+        MovePlayer(1);
         UpdateStepUI();
-
-        manualOverride = false;
     }
 
     public void SubtractStep()
     {
-        manualOverride = true;
-        displayedSteps = Mathf.Max(0, displayedSteps - 1);
-        MovePlayer(-1);
-        UpdateStepUI();
-
-        manualOverride = false;
+        if (manualSteps + realSteps > 0)
+        {
+            manualSteps--;
+            MovePlayer(-1);
+            UpdateStepUI();
+        }
     }
 
-    // ---------- Helper Functions ----------
     private void UpdateStepUI()
     {
+        int displayedSteps = realSteps + manualSteps;
         if (stepText != null)
-        {
             stepText.text = displayedSteps.ToString();
-        }
     }
 
     private void MovePlayer(int steps)
     {
         if (player != null && steps != 0)
-        {
             player.Translate(Vector3.forward * stepDistance * steps);
-        }
-    }
-
-    void LateUpdate()
-    {
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
     }
 }
