@@ -41,7 +41,7 @@ public class UserMovement_Editor : MonoBehaviour
     Vector3 gripRot;                                  // ... of grip point obj ...
 
     public float moveSpeed = 10f;       // speed of user's translation
-    public float rotSpeed = 50f;        // speed of user's rotation
+    public float rotSpeed = 300;        // speed of user's rotation
     float updatedMoveSpeed;             // for enabling slow down movement
 
     public float sensitivity = 10f;     // control the sensitivity of mouse in the game
@@ -86,7 +86,7 @@ public class UserMovement_Editor : MonoBehaviour
         gripRot = gripPoint.transform.localEulerAngles;
 
         /* Lock the mouse into game once start */
-        Cursor.lockState = CursorLockMode.Locked;
+        // Cursor.lockState = CursorLockMode.Locked;
     }
 
 
@@ -139,11 +139,11 @@ public class UserMovement_Editor : MonoBehaviour
             {
                 moveStep = Vector3.back * updatedMoveSpeed * Time.deltaTime;
             }
-            if (Input.GetKey(KeyCode.A))
+            if (Input.GetKey(KeyCode.Q))
             {
                 moveStep = Vector3.left * updatedMoveSpeed * Time.deltaTime;
             }
-            if (Input.GetKey(KeyCode.D))
+            if (Input.GetKey(KeyCode.E))
             {
                 moveStep = Vector3.right * updatedMoveSpeed * Time.deltaTime;
             }
@@ -166,44 +166,84 @@ public class UserMovement_Editor : MonoBehaviour
     /// </summary>
     void RotationControl()
     {
-        /* Using Mouse to control all the rotations 
-         *
-         * NOTE - Rotation rules:
-         * 1. Horizontal rotation is y-axis
-         * 2. Forward & Back rotation is x-axis
-         * 3. Right to Left Side rotation is z-axis
-         *
-         */
-        userRot.y += Input.GetAxis("Mouse X") * sensitivity;        // Let user's horizontal rotation to be controlled by left & right movement of mouse
-        gripRot.x -= Input.GetAxis("Mouse Y") * sensitivity;        // Let gripPoint's forward & back rotation to be controlled by fron & back movement of mouse. We use Why using "-=": For similar reason as above
+        // /* Using Mouse to control all the rotations 
+        //  *
+        //  * NOTE - Rotation rules:
+        //  * 1. Horizontal rotation is y-axis
+        //  * 2. Forward & Back rotation is x-axis
+        //  * 3. Right to Left Side rotation is z-axis
+        //  *
+        //  */
+        // //userRot.y += Input.GetAxis("Mouse X") * sensitivity;        // Let user's horizontal rotation to be controlled by left & right movement of mouse
+        // gripRot.x -= Input.GetAxis("Mouse Y") * sensitivity;        // Let gripPoint's forward & back rotation to be controlled by fron & back movement of mouse. We use Why using "-=": For similar reason as above
 
+        // if (gripRot.x > 90)
+        // {
+        //     gripRot.x -= 90;
+        // }
+
+        // transform.localEulerAngles = userRot;                       // Assigning the most updated ROT to user, head, and grip's localRotation
+        // gripPoint.transform.localEulerAngles = gripRot;
+
+        // /* Rotate Avatar' head horizontally to test 3D audio */
+        // if (Input.GetKey(KeyCode.Q))
+        // {
+        //     head.transform.localEulerAngles += new Vector3(0, -1, 0);
+        // }
+        // if (Input.GetKey(KeyCode.E))
+        // {
+        //     head.transform.localEulerAngles += new Vector3(0, 1, 0);
+        // }
+
+        // /* Rotate Avatar's head vertically */
+        // if (Input.GetKey(KeyCode.R))
+        // {
+        //     head.transform.localEulerAngles += new Vector3(-1, 0, 0);
+        // }
+        // if (Input.GetKey(KeyCode.F))
+        // {
+        //     head.transform.localEulerAngles += new Vector3(1, 0, 0);
+        // }
+
+        /* * MODIFIED: Keyboard Rotation Control 
+         * - Mouse control has been commented out.
+         * - Q/E controls User Horizontal Rotation (Y-axis)
+         * - R/F controls Grip Vertical Rotation (X-axis)
+         */
+
+        // --- 1. Horizontal Rotation (User Body) ---
+        // userRot.y += Input.GetAxis("Mouse X") * sensitivity; // <--- Old Mouse Code
+        
+        if (Input.GetKey(KeyCode.A))
+        {
+            userRot.y -= rotSpeed * Time.deltaTime; // Rotate Left
+        }
+        if (Input.GetKey(KeyCode.D))
+        {
+            userRot.y += rotSpeed * Time.deltaTime; // Rotate Right
+        }
+
+        // --- 2. Vertical Rotation (Grip Point) ---
+        // gripRot.x -= Input.GetAxis("Mouse Y") * sensitivity; // <--- Old Mouse Code
+
+        if (Input.GetKey(KeyCode.R))
+        {
+            gripRot.x -= rotSpeed * Time.deltaTime; // Tilt Up
+        }
+        if (Input.GetKey(KeyCode.F))
+        {
+            gripRot.x += rotSpeed * Time.deltaTime; // Tilt Down
+        }
+
+        // Clamp or reset logic (preserved from original script)
         if (gripRot.x > 90)
         {
             gripRot.x -= 90;
         }
 
-        transform.localEulerAngles = userRot;                       // Assigning the most updated ROT to user, head, and grip's localRotation
+        // Apply the rotations
+        transform.localEulerAngles = userRot;                       
         gripPoint.transform.localEulerAngles = gripRot;
-
-        /* Rotate Avatar' head horizontally to test 3D audio */
-        if (Input.GetKey(KeyCode.Q))
-        {
-            head.transform.localEulerAngles += new Vector3(0, -1, 0);
-        }
-        if (Input.GetKey(KeyCode.E))
-        {
-            head.transform.localEulerAngles += new Vector3(0, 1, 0);
-        }
-
-        /* Rotate Avatar's head vertically */
-        if (Input.GetKey(KeyCode.R))
-        {
-            head.transform.localEulerAngles += new Vector3(-1, 0, 0);
-        }
-        if (Input.GetKey(KeyCode.F))
-        {
-            head.transform.localEulerAngles += new Vector3(1, 0, 0);
-        }
     }
 
 
