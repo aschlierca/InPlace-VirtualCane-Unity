@@ -14,7 +14,7 @@ public class UIManager : MonoBehaviour
     [Header("Settings Config")]
     public float scaleSize = 0.1f;
     private int currentHeightInches = 68;
-    
+
     // Reference to the Step Counter to update stride length
     private StepCount stepCount;
 
@@ -22,72 +22,72 @@ public class UIManager : MonoBehaviour
     {
         // --- Initialization ---
         // Try to find StepCount on the same object, or searching the scene if needed
-        stepCount = GetComponent<StepCount>(); 
-        if(stepCount == null) stepCount = FindObjectOfType<StepCount>();
+        stepCount = GetComponent<StepCount>();
+        if (stepCount == null) stepCount = FindObjectOfType<StepCount>();
 
         // Load saved data
-        if(volumeSlider) volumeSlider.value = PlayerPrefs.GetFloat("Volume", 0.5f);
-        if(hapticsSlider) hapticsSlider.value = PlayerPrefs.GetFloat("Haptics", 0.5f);
-        if(sensitivitySlider) sensitivitySlider.value = PlayerPrefs.GetFloat("Sensitivity", 0.5f);
+        if (volumeSlider) volumeSlider.value = PlayerPrefs.GetFloat("Volume", 0.5f);
+        if (hapticsSlider) hapticsSlider.value = PlayerPrefs.GetFloat("Haptics", 0.5f);
+        if (sensitivitySlider) sensitivitySlider.value = PlayerPrefs.GetFloat("Sensitivity", 0.5f);
         currentHeightInches = PlayerPrefs.GetInt("Height", 68);
 
         UpdateHeightDisplay();
     }
 
     // ---------------- SETTINGS CONTROLS (Keep existing logic) ---------------- //
-    public void VolumeUp() { if(volumeSlider) { volumeSlider.value += scaleSize; SaveSettings(); } }
-    public void VolumeDown() { if(volumeSlider) { volumeSlider.value -= scaleSize; SaveSettings(); } }
-    
-    public void HapticsUp() 
-    { 
-        if(hapticsSlider) { hapticsSlider.value += scaleSize; Handheld.Vibrate(); SaveSettings(); } 
-    }
-    public void HapticsDown() { if(hapticsSlider) { hapticsSlider.value -= scaleSize; SaveSettings(); } }
+    public void VolumeUp() { if (volumeSlider) { volumeSlider.value += scaleSize; SaveSettings(); } }
+    public void VolumeDown() { if (volumeSlider) { volumeSlider.value -= scaleSize; SaveSettings(); } }
 
-    public void SensitivityUp() { if(sensitivitySlider) { sensitivitySlider.value += scaleSize; SaveSettings(); } }
-    public void SensitivityDown() { if(sensitivitySlider) { sensitivitySlider.value -= scaleSize; SaveSettings(); } }
-
-    public void HeightUp() 
-    { 
-        currentHeightInches++; 
-        UpdateHeightAndStride(); 
+    public void HapticsUp()
+    {
+        if (hapticsSlider) { hapticsSlider.value += scaleSize; Handheld.Vibrate(); SaveSettings(); }
     }
-    public void HeightDown() 
-    { 
-        currentHeightInches--; 
-        UpdateHeightAndStride(); 
+    public void HapticsDown() { if (hapticsSlider) { hapticsSlider.value -= scaleSize; SaveSettings(); } }
+
+    public void SensitivityUp() { if (sensitivitySlider) { sensitivitySlider.value += scaleSize; SaveSettings(); } }
+    public void SensitivityDown() { if (sensitivitySlider) { sensitivitySlider.value -= scaleSize; SaveSettings(); } }
+
+    public void HeightUp()
+    {
+        currentHeightInches++;
+        UpdateHeightAndStride();
+    }
+    public void HeightDown()
+    {
+        currentHeightInches--;
+        UpdateHeightAndStride();
     }
 
     // ---------------- SCENE SWITCHING (New Room Methods) ---------------- //
-    
+
     public void LoadBlueRoom()
     {
         // Replace "ExplorationPart" with your actual Blue Room scene name
-        SceneManager.LoadScene("ExplorationPart"); 
+        SceneManager.LoadScene("BlueRoom");
     }
 
     public void LoadGreenRoom()
     {
         // Replace "ExplorationPartV2" with your actual Green Room scene name
-        SceneManager.LoadScene("ExplorationPartV2");
+        SceneManager.LoadScene("GreenRoom");
     }
 
     public void LoadRedRoom()
     {
         // Replace "ExplorationPartV3" with your actual Red Room scene name
-        SceneManager.LoadScene("ExplorationPartV3");
+        SceneManager.LoadScene("RedRoom");
     }
 
     public void LoadMainMenu()
     {
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("TestRoom");
     }
 
     // ---------------- HELPER FUNCTIONS ---------------- //
     private void UpdateHeightAndStride()
     {
         UpdateHeightDisplay();
-        if(stepCount != null)
+        if (stepCount != null)
         {
             stepCount.stepDistance = 0.415f * currentHeightInches;
         }
@@ -96,7 +96,7 @@ public class UIManager : MonoBehaviour
 
     private void UpdateHeightDisplay()
     {
-        if(heightText)
+        if (heightText)
         {
             int feet = currentHeightInches / 12;
             int inches = currentHeightInches % 12;
@@ -106,9 +106,9 @@ public class UIManager : MonoBehaviour
 
     private void SaveSettings()
     {
-        if(volumeSlider) PlayerPrefs.SetFloat("Volume", volumeSlider.value);
-        if(hapticsSlider) PlayerPrefs.SetFloat("Haptics", hapticsSlider.value);
-        if(sensitivitySlider) PlayerPrefs.SetFloat("Sensitivity", sensitivitySlider.value);
+        if (volumeSlider) PlayerPrefs.SetFloat("Volume", volumeSlider.value);
+        if (hapticsSlider) PlayerPrefs.SetFloat("Haptics", hapticsSlider.value);
+        if (sensitivitySlider) PlayerPrefs.SetFloat("Sensitivity", sensitivitySlider.value);
         PlayerPrefs.SetInt("Height", currentHeightInches);
         PlayerPrefs.Save();
     }

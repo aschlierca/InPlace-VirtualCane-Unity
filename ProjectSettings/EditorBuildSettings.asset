@@ -8,6 +8,18 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/GameRoom/TestRoom.unity
+    guid: add8f0d87eefa4f57bd51ecccbe35f86
+  - enabled: 1
+    path: Assets/Scenes/GameRoom/BlueRoom.unity
+    guid: e258db80c5c084390a0b1a90f4cb6b43
+  - enabled: 1
+    path: Assets/Scenes/GameRoom/GreenRoom.unity
+    guid: 6c0643987455741df933cf17fc707479
+  - enabled: 1
+    path: Assets/Scenes/GameRoom/RedRoom.unity
+    guid: daed0488a9658401088a3fbd4679d640
   m_configObjects:
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: cf05982d2b5e844afbd35f7b7ce93932, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 642d5fd10839a46b1bada6cbacae78c3, type: 2}

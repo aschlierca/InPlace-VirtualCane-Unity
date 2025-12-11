@@ -1222,7 +1222,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 590175526}
         m_TargetAssemblyTypeName: PageManager, Assembly-CSharp
-        m_MethodName: OpenPage
+        m_MethodName: SwitchToTab
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 1265193383}
@@ -5807,7 +5807,7 @@ PrefabInstance:
     - target: {fileID: 4690667662381686233, guid: 6b49814b995f1472eb33910314780f67, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: d34dd39b3cbd34903a3964fdb62abee4, type: 2}
+      objectReference: {fileID: 2100000, guid: b4a0ffc8cf7764433b5bdb384cfffee2, type: 2}
     - target: {fileID: 5143178934119751301, guid: 6b49814b995f1472eb33910314780f67, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -9107,7 +9107,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 590175526}
         m_TargetAssemblyTypeName: PageManager, Assembly-CSharp
-        m_MethodName: OpenPage
+        m_MethodName: SwitchToTab
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 1571321072}
@@ -11140,13 +11140,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 590175524}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 590175525}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: LoadRedRoom
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -11477,13 +11477,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 590175524}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 590175525}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: LoadGreenRoom
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -11666,7 +11666,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 590175526}
         m_TargetAssemblyTypeName: PageManager, Assembly-CSharp
-        m_MethodName: OpenPage
+        m_MethodName: SwitchToTab
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 72513271}
@@ -11851,13 +11851,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 590175524}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 590175525}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: LoadBlueRoom
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
