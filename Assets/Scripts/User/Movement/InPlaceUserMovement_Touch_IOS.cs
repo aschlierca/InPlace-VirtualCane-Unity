@@ -522,7 +522,7 @@ public class InPlaceUserMovement_Touch_IOS : MonoBehaviour
             else
             {
                 // 如果没有击中物体，输出信息
-                //Debug.Log("No object detected in front.");
+                Debug.Log("No object detected in front.");
             }
         }
     }

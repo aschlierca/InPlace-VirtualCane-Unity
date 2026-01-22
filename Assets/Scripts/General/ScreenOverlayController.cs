@@ -30,12 +30,12 @@ public class ScreenOverlayController : MonoBehaviour
 
     public void SetOverlay(bool active)
     {
-        foreach (GameObject obj in camLst)
+        foreach(GameObject obj in camLst)
         {
             Camera cam = obj.transform.GetComponent<Camera>();
             int layer = active ? 0 : -1;
             cam.cullingMask = layer;
-            //Debug.LogError("============ layer  " + layer + "   " + cam.cullingMask);
+            Debug.LogError("============ layer  " + layer + "   " + cam.cullingMask);
         }
     }
 }

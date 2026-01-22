@@ -65,7 +65,7 @@ public class ScenarioManager : MonoBehaviour
         // numCars = UnityEngine.Random.Range(2, 5);
         // numCars = 5;
         // currentCars = new Car[numCars];
-        //trafficLight.ResetTrafficLight();
+        trafficLight.ResetTrafficLight();
         //SetupListener();
     }
 
@@ -75,10 +75,10 @@ public class ScenarioManager : MonoBehaviour
         scenarioTimer = 0f;
         timer = 0f;
         logTimer = 0f;
-        //if (gameManager.shouldRecord)
-        //{
-        //    WriteScenarioLogFile();
-        //}
+        if (gameManager.shouldRecord)
+        {
+            WriteScenarioLogFile();
+        }
         GenerateCars();
     }
 
@@ -90,7 +90,7 @@ public class ScenarioManager : MonoBehaviour
         logTimer += floatTimeDelta;
 
         // Updates for traffic light
-        /*if (timer >= 1f)
+        if (timer >= 1f)
         {
             timer = 0f;
             // Change light signal if 10 seconds elapsed
@@ -98,7 +98,7 @@ public class ScenarioManager : MonoBehaviour
             {
                 trafficLight.ChangeLightSignal();
             }
-        }*/
+        }
 
         // Update for car logging
         if (logTimer >= logInterval)
@@ -114,10 +114,10 @@ public class ScenarioManager : MonoBehaviour
                 Car currentCar = scenarioCars[i];
                 if (currentCar.isActiveAndEnabled)
                 {
-                    //if (gameManager.shouldRecord)
-                    //{
-                    //    UpdateCarLogFile(i);
-                    //}
+                    if (gameManager.shouldRecord)
+                    {
+                        UpdateCarLogFile(i);
+                    }
                     carCounter += 1;
                 }
             }
@@ -165,10 +165,10 @@ public class ScenarioManager : MonoBehaviour
             Car currentCar = scenarioCars[i];
             currentCar.gameObject.SetActive(true);
             
-            //if (gameManager.shouldRecord)
-            //{
-            //    CreateCarLogFile(i);
-            //}
+            if (gameManager.shouldRecord)
+            {
+                CreateCarLogFile(i);
+            }
             if (i == 0)
             {
                 hasStarted = true;

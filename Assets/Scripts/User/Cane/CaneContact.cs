@@ -17,7 +17,7 @@ public class CaneContact : MonoBehaviour
 
     SoundBallMovement soundBallMovement;                        // SoundBallMovement class for controlling where the sound ball will move to
     AudioManager_Feedback audioManagerFb;                       // AudioManager_Feedback class for feedback sound playing
-    //VibrationManager_Feedback vibrationManagerFb;               // VibrationManager_Feedback class for playing feedback vibration
+    VibrationManager_Feedback vibrationManagerFb;               // VibrationManager_Feedback class for playing feedback vibration
     VerbalManager_Feedback verbalManagerFb;                     // VerbalManager_Feedback class for speaking a text
 
     [SerializeField]
@@ -32,7 +32,7 @@ public class CaneContact : MonoBehaviour
 
     [SerializeField]
     public List<string> objDoNotVibrate = new List<string>()    // For these objects, we don't want to provide physical vibration when the cane hits it 
-    { };
+    {};
 
 
     private void Start()
@@ -40,7 +40,7 @@ public class CaneContact : MonoBehaviour
         /* Assign components to the declared variables */
         soundBallMovement = GameObject.Find("SoundBall").GetComponent<SoundBallMovement>();
         audioManagerFb = GameObject.Find("SoundBall").GetComponent<AudioManager_Feedback>();
-        //vibrationManagerFb = transform.GetComponent<VibrationManager_Feedback>();
+        vibrationManagerFb = transform.GetComponent<VibrationManager_Feedback>();
         verbalManagerFb = GameObject.Find("SoundBall").GetComponent<VerbalManager_Feedback>();
 
         /* Force turning off the "isTrigger" for the cane */
@@ -149,7 +149,7 @@ public class CaneContact : MonoBehaviour
                 audioManagerFb.StopFeedbackAudioByType("Hit");
 
                 /* Stop any physical vibration */
-                //vibrationManagerFb.StopVibrationByType("Hit");
+                vibrationManagerFb.StopVibrationByType("Hit");
             }
 
             /* Playing the newly requested audio feedback */
@@ -248,7 +248,7 @@ public class CaneContact : MonoBehaviour
     {
         if (!InNotVibrateList(other))
         {
-            //vibrationManagerFb.StartVibration(materialAndAction);
+            vibrationManagerFb.StartVibration(materialAndAction);
         }
     }
 

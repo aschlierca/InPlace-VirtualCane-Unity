@@ -1,173 +1,178 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+//using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Car : MonoBehaviour
 {
-    public float initialSpeed = 4f;
-    public float moveSpeed = 4f;
-    private float targetSpeed = 4f;
-
+    public float initialSpeed = 5f;
+    public float moveSpeed = 5f;
+    private float targetSpeed = 5f;
+    private Vector3 initialPosition;
     public int directionOfApproach;
     private Vector3 targetPosition;
-    private Vector3 targetDirection;
-
-    public float rotationSpeed = 90f;
-    private Quaternion targetRotation;
-    private bool isRotating = false;
+    public LayerMask backBumperMask;
+    public LayerMask trafficBoxMask;
+    public GameObject frontBumper;
     public TrafficLight trafficLight;
     public bool isFront = false;
-    public GameObject frontBumper;
-    public LayerMask backBumperMask;
-    public LayerMask trafficBoxmask;
+
+
+    void Start()
+    {
+        // Debug.Log(gameObject.name + " created.");
+    }
 
     void OnEnable()
     {
+        transform.position = initialPosition;
         moveSpeed = initialSpeed;
-        targetRotation = transform.rotation;
-        isRotating = false;
     }
-
-    public IEnumerator FollowWaypoints(Waypoint currentWaypoint)
-    {
-        if (currentWaypoint == null)
-        yield break;
-
-    while (gameObject.activeSelf)
-    {
-        Waypoint nextWaypoint = null;
-
-        if (currentWaypoint.nextWaypoints != null && currentWaypoint.nextWaypoints.Count > 0)
-        {
-            int randomIndex = UnityEngine.Random.Range(0, currentWaypoint.nextWaypoints.Count);
-            nextWaypoint = currentWaypoint.nextWaypoints[randomIndex];
-        }
-        else
-        {
-            gameObject.SetActive(false);
-            yield break;
-        }
-
-        SetTargetPosition(nextWaypoint.transform);
-        Vector3 directionToNext = (nextWaypoint.transform.position - transform.position).normalized;
-        if (directionToNext != Vector3.zero)
-            SetTargetDirection(directionToNext);
-
-        // Move toward next waypoint
-        while (Vector3.Distance(transform.position, nextWaypoint.transform.position) > 0.5f && gameObject.activeInHierarchy)
-        {
-            // --- TRAFFIC LIGHT CHECK ---
-            if (trafficLight != null && !trafficLight.ShouldGo(directionOfApproach))
-            {
-                // Stop at red
-                yield return null; // wait one frame, then check again
-                continue;
-            }
-
-            // Move normally
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-
-            // Rotate toward direction
-            if (targetDirection != Vector3.zero)
-            {
-                Quaternion targetRot = Quaternion.LookRotation(targetDirection);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, 5f * Time.deltaTime);
-            }
-
-            yield return null; // wait one frame
-        }
-
-        currentWaypoint = nextWaypoint;
-        yield return new WaitForSeconds(0.05f);
-    }
-    }
-
-
 
     void FixedUpdate()
     {
-        HandleRotation();
+        // Move forward
         HandleMovement();
-    }
 
-    void HandleRotation()
-    {
-        if (isRotating)
+        // Raycast to detect cars ahead
+        Vector3 origin = frontBumper.transform.position;
+        // By default, cars travel west to east (0 degrees)
+        Vector3 direction = -transform.forward;
+        float distance = 5f;
+        RaycastHit hit;
+        Physics.Raycast(origin, direction, out hit, distance);
+        Debug.DrawRay(origin, direction * distance, Color.green);
+        // If there is a car or traffic light close ahead
+        if (hit.collider != null)
         {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
-            if (Quaternion.Angle(transform.rotation, targetRotation) < 0.1f)
+            // Match car speed to car ahead or has traffic light near
+            Car hitCar = hit.collider.GetComponentInParent<Car>();
+            if (hitCar != null)
             {
-                transform.rotation = targetRotation;
-                isRotating = false;
+                // Debug.Log(gameObject.name + " detects " + hitCar.name + " at " + hitCar.moveSpeed + " m/s.");
+                float carAheadSpeed = hitCar.moveSpeed;
+
+                SetTargetSpeed(carAheadSpeed);
+            }
+            else
+            {
+                if (!trafficLight.ShouldGo(directionOfApproach))
+                {
+                    SetTargetSpeed(0f);
+                    isFront = true;
+                }
+            }
+        }
+        else
+        {
+            SetTargetSpeed(initialSpeed);
+            isFront = false;
+        }
+
+        // Debug.LogError(gameObject.name + " is front: " + isFront);
+        if (isFront)
+        {
+            // Debug.Log(gameObject.name + " is front car.");
+            if (trafficLight.ShouldGo(directionOfApproach))
+            {
+                // Debug.Log(gameObject.name + " called to go.");
+                // MovementRestart();
+                SetTargetSpeed(initialSpeed);
             }
         }
     }
 
-    void HandleMovement()
+    // void OnTriggerEnter2D(Collider2D collision)
+    // {
+    //     // Debug.LogError("Car collided with " + col.name);
+    //     if (!trafficLight.ShouldGo(directionOfApproach))
+    //     {
+    //         MovementStop();
+    //         isFront = true;
+    //     }
+    // }
+
+    public void HandleMovement()
     {
-        if (trafficLight != null && !trafficLight.ShouldGo(directionOfApproach))
+        // Quicker slow down
+        if (moveSpeed > targetSpeed)
         {
-            // Red light — stop the car
-            return;
+            float diff = moveSpeed - targetSpeed;
+            if (diff > 0.5f)
+            {
+                moveSpeed = moveSpeed - 0.5f;
+            }
+            else
+            {
+                moveSpeed = targetSpeed;
+            }
         }
-
-        float currentSpeed = moveSpeed;
-
-        // Optional: reduce speed when turning
-        if (isRotating)
-            currentSpeed *= 0.7f;
-
-        if (currentSpeed > targetSpeed)
-            currentSpeed = Mathf.Max(currentSpeed - 0.5f, targetSpeed);
         else
-            currentSpeed = Mathf.Min(currentSpeed + 0.01f, targetSpeed);
-
-        if (!isRotating)
-            moveSpeed = currentSpeed;
-        if (currentSpeed <= 4f)
-            currentSpeed = 4f;
-        // Move toward target
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, currentSpeed * Time.fixedDeltaTime);
-    }
-
-    
-
-    public void SetInitialPosition(Transform startPos, int direction)
-    {
-        transform.position = startPos.position;
-        transform.rotation = startPos.rotation;
-        directionOfApproach = direction;
-        targetRotation = transform.rotation;
-    }
-
-    public void SetTargetPosition(Transform waypoint)
-    {
-        targetPosition = waypoint.position;
-
-    }
-
-
-
-    public void SetTargetDirection(Vector3 direction)
-    {
-        targetDirection = direction.normalized;
-
-    }
-
-    private void Update()
-    {
-    // Only move if we have a target
-    if (targetPosition != Vector3.zero)
-    {
-        // Move
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-
-        // Calculate direction to face
-        Vector3 direction = (targetPosition - transform.position).normalized;
-        if (direction.sqrMagnitude > 0.001f)
         {
-            Quaternion targetRot = Quaternion.LookRotation(direction, Vector3.up);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+            float diff = targetSpeed - moveSpeed;
+            if (diff > 0.01f)
+            {
+                moveSpeed = moveSpeed + 0.01f;
+            }
+            else
+            {
+                moveSpeed = targetSpeed;
+            }
+        }
+
+        // Move towards target
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.fixedDeltaTime);
+
+        // Check if car reached target, stop car
+        if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
+        {
+            moveSpeed = 0f;
+            gameObject.SetActive(false);
+            // Destroy(gameObject);
         }
     }
+
+    // public void SetTrafficBoxMask(LayerMask curMask)
+    // {
+    //     trafficBoxMask = curMask;
+    // }
+
+    public void MovementStop()
+    {
+        moveSpeed = 0f;
+    }
+
+    public void MovementRestart()
+    {
+        moveSpeed = initialSpeed;
+    }
+
+    public void SetInitialPosition(Transform newPosition, int directionOfApproachInt)
+    {
+        initialPosition = newPosition.position;
+        transform.rotation = newPosition.rotation;
+        transform.position = initialPosition;
+        directionOfApproach = directionOfApproachInt;
+    }
+
+    public void SetTargetPosition(Transform newPosition)
+    {
+        targetPosition = newPosition.position;
+    }
+
+    public void SetTargetSpeed(float speed)
+    {
+        targetSpeed = speed;
+    }
+
+    public void SetInitialSpeed(float speed)
+    {
+        initialSpeed = speed;
+    }
+    public void StartCar()
+    {
+        moveSpeed = initialSpeed;
     }
 }

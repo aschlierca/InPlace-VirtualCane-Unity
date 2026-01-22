@@ -2,15 +2,12 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
-using System.Collections.Generic;
-using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
     public string videoDataDir = "data/4_channel/video/";
     public ScenarioFactory scenarioFactory;
     public CarFactory carFactory;
-    public TrafficLight trafficLight;
     //public RecorderFactory recorderFactory;
     public bool shouldRecord = true;
     public bool isFourDirections = false;
@@ -21,6 +18,16 @@ public class GameManager : MonoBehaviour
     public const int maxScenarios = 200;
     private int totalScenarios = maxScenarios;
     private bool hasEnded = false;
+
+    // In-game waypoints
+    public Transform startEast;
+    public Transform endEast;
+    public Transform startWest;
+    public Transform endWest;
+    public Transform startNorth;
+    public Transform endNorth;
+    public Transform startSouth;
+    public Transform endSouth;
 
     // Scenario related constants
     private float minX = 7f;
@@ -35,13 +42,6 @@ public class GameManager : MonoBehaviour
     public int numCars;
     public string dateTimeString;
     public Car[] currentCars;
-    public int startPosInt;
-
-    public Waypoint startWaypointNorth;
-    //public Waypoint startWaypointEast;
-    //public Waypoint startWaypointSouth;
-    //public Waypoint startWaypointWest;
-    public Waypoint startWaypoint; //isStart true waypoint
 
     void Awake()
     {
@@ -56,7 +56,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Driver Capabilities: " + AudioSettings.driverCapabilities);
         Debug.Log("Real Voices: " + configs.numRealVoices);
         Debug.Log("Virtual Voices: " + configs.numVirtualVoices);
-
+        
         numScenarios = 0;
         CreateParameters();
         GenerateScenario();
@@ -64,6 +64,26 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate()
     {
+        /*if (currentScenario != null && !currentScenario.isRunning)
+        {
+            if (shouldRecord)
+            {
+                if (gameRecorder.isRecording)
+                {
+                    gameRecorder.StopRecording();
+                    gameRecorder.DestroyGameObject();
+                }
+            }
+            if (numScenarios < totalScenarios)
+            {
+                currentScenario.DestroyGameObject();
+                // If back scenario was just run, create new parameters
+                CreateParameters();
+                GenerateScenario();
+            }
+            
+        }
+        */
         if (numScenarios >= totalScenarios && !currentScenario.isRunning && !hasEnded)
         {
             Debug.Log("Simulation complete.");
@@ -74,102 +94,78 @@ public class GameManager : MonoBehaviour
     void CreateParameters()
     {
         // Setup listener parameters
-    newX = UnityEngine.Random.Range(minX, maxX);
-    newY = UnityEngine.Random.Range(minY, maxY);
-    newAngle = UnityEngine.Random.Range(0, 360);
+        newX = UnityEngine.Random.Range(minX, maxX);
+        newY = UnityEngine.Random.Range(minY, maxY);
+        newAngle = UnityEngine.Random.Range(0, 360);
 
-    // Setup scenario parameters
-    numCars = UnityEngine.Random.Range(1, maxCars);
-    dateTimeString = DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss");
+        // Parallel for testing
+        // newAngle = 0;
+        
+        // Setup scenario parameters
+        numCars = UnityEngine.Random.Range(1, maxCars);
+        dateTimeString = DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss");
 
-    // Create array once
-    currentCars = new Car[numCars];
-
-    // Start spawning cars with delay
-    StartCoroutine(SpawnCarsWithDelay(numCars, 1f)); // 1 second gap between cars
-    }
-    private IEnumerator SpawnCarsWithDelay(int totalCars, float delay)
-    {
+        // Setup car parameters
+        currentCars = new Car[numCars];
         for (int i = 0; i < numCars; i++)
         {
             InstantiateCar(i);
-            yield return new WaitForSeconds(delay);
         }
     }
+
     void InstantiateCar(int carNumber)
     {
-        currentCars[carNumber] = carFactory.GetCar();
-        Car currentCar = currentCars[carNumber];
+        //Debug.LogError("==========num " + carNumber);
+        Transform startPos;
+        Transform endPos;
 
-        currentCar.trafficLight = trafficLight;
+        int startPosInt;
+        
+        startPosInt = UnityEngine.Random.Range(0, 4);
+        //System.Random random = new System.Random();
+        //startPosInt = random.Next(0, 5);
+        //Debug.Log("Car " + carNumber + " starting at position: " + startPosInt);
+        
 
-        int randomDirection = UnityEngine.Random.Range(0, 4);
-        int north = 0;
-        Waypoint startWaypoint = null;
 
-        switch (north)
+
+        // Initial/ideal speed of car
+        float carSpeed = UnityEngine.Random.Range(6.7f, 15.6f);
+
+        // Set starting position of car
+        if (startPosInt == 0)
         {
-            case 0:
-                startWaypoint = startWaypointNorth;
-                break;
-                /*case 1:
-                    startWaypoint = startWaypointEast;
-                    break;
-                case 2:
-                    startWaypoint = startWaypointSouth;
-                    break;
-                case 3:
-                    startWaypoint = startWaypointWest;
-                    break;
-                */
+            startPos = startNorth;
+            endPos = endSouth;
+            //Debug.Log("Car " + carNumber + " starting at North.");
         }
-
-
-
-        currentCar.transform.position = startWaypoint.transform.position;
-        //Debug.Log($"Car {currentCar.name} instantiated at position {currentCar.transform.position}");
-        Vector3 firstTargetPos = startWaypoint.nextWaypoints[0].transform.position;
-        Vector3 dir = (firstTargetPos - startWaypoint.transform.position).normalized;
-        if (dir != Vector3.zero)
+        else if (startPosInt == 1)
         {
-            currentCar.transform.rotation = Quaternion.LookRotation(dir);
+            startPos = startEast;
+            endPos = endWest;
+            //Debug.Log("Car " + carNumber + " starting at East.");
         }
-        currentCar.SetInitialPosition(startWaypoint.transform, randomDirection);
-
-        currentCar.gameObject.SetActive(true);
-        StartCoroutine(currentCar.FollowWaypoints(startWaypoint));
-
-        if (carNumber == 0)
+        else if (startPosInt == 2)
         {
-            Destroy(currentCar.gameObject);
-            return;
+            startPos = startSouth;
+            endPos = endNorth;
+            //Debug.Log("Car " + carNumber + " starting at South.");
         }
+        else
+        {
+            startPos = startWest;
+            endPos = endEast;
+            //Debug.Log("Car " + carNumber + " starting at West.");
+        }
+            currentCars[carNumber] = carFactory.GetCar();
+            Car currentCar = currentCars[carNumber];
+            currentCar.gameObject.SetActive(false);
+            currentCar.SetInitialPosition(startPos, startPosInt);
+            //Debug.Log("Car " + carNumber + " initial position: " + startPos);
+            currentCar.SetTargetPosition(endPos);
+            currentCar.SetInitialSpeed(carSpeed);
+            currentCar.name = string.Format("car_{0}", carNumber);
     }
-
-
-    // Helper method to find the starting waypoint in a waypoint container
-    private Waypoint FindStartWaypoint(GameObject waypointContainer)
-    {
-        Waypoint[] waypoints = waypointContainer.GetComponentsInChildren<Waypoint>();
-        
-        // First try to find a waypoint marked as start
-        foreach (Waypoint waypoint in waypoints)
-        {
-            if (waypoint.isStart)
-            {
-                return waypoint;
-            }
-        }
-        
-        // If no waypoint is marked as start, return the first one
-        if (waypoints.Length > 0)
-        {
-            return waypoints[0];
-        }
-        
-        return null;
-    }
-
 
     async void GenerateScenario()
     {
@@ -189,6 +185,6 @@ public class GameManager : MonoBehaviour
         }
         */
         numScenarios += 1;
-        Debug.Log("Scenario " + numScenarios + " created.");
+        Debug.Log("Scenario "+ numScenarios + " created.");
     }
 }
