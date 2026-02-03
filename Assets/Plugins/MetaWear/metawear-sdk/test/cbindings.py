@@ -1,1 +1,0 @@
-../bindings/python/mbientlab/metawear/cbindings.py
