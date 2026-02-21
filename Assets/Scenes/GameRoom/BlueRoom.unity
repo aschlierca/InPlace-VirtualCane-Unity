@@ -1153,6 +1153,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ef217c7be11643b4a50eca670a5c67c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gripPoint: {fileID: 2058365068}
+  caneTip: {fileID: 138156935}
+  gyroScale: 1.5
+  accScale: 0.4
+--- !u!4 &138156935 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3829219950962101537, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
+  m_PrefabInstance: {fileID: 1741581284}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &157264751
 GameObject:
   m_ObjectHideFlags: 0
@@ -6752,7 +6761,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: MRCane CSC272
+  m_text: MRCane
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -10162,6 +10171,10 @@ PrefabInstance:
       propertyPath: m_DynamicOccludee
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3829219950962101550, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
+      propertyPath: m_Name
+      value: VirtualCane
+      objectReference: {fileID: 0}
     - target: {fileID: 3829219951197841245, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -12245,6 +12258,11 @@ MonoBehaviour:
   m_Increments: 5
   m_IncrementInPercent: 1
   m_WholeNumbersOnly: 1
+--- !u!4 &2058365068 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 512056233903022863, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
+  m_PrefabInstance: {fileID: 1741581284}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2081757135
 GameObject:
   m_ObjectHideFlags: 0
