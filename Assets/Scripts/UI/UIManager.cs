@@ -6,10 +6,14 @@ using UnityEngine.SceneManagement; // Required for switching scenes
 public class UIManager : MonoBehaviour
 {
     [Header("UI References")]
+    public TMP_Text BluetoothConnectionText;
     public Slider volumeSlider;
     public Slider hapticsSlider;
     public Slider sensitivitySlider;
     public TextMeshProUGUI heightText;
+
+    [Header("Bluetooth")]
+    public MetaWearReceiver metaWearReceiver;
 
     [Header("Settings Config")]
     public float scaleSize = 0.1f;
@@ -32,6 +36,29 @@ public class UIManager : MonoBehaviour
         currentHeightInches = PlayerPrefs.GetInt("Height", 68);
 
         UpdateHeightDisplay();
+
+        // Initialize Bluetooth status display
+        if (BluetoothConnectionText)
+        {
+            BluetoothConnectionText.text = "Disconnected";
+            BluetoothConnectionText.color = Color.red;
+        }
+
+        if (metaWearReceiver != null)
+            metaWearReceiver.OnConnectionChanged += UpdateConnectionStatus;
+    }
+
+    void OnDestroy()
+    {
+        if (metaWearReceiver != null)
+            metaWearReceiver.OnConnectionChanged -= UpdateConnectionStatus;
+    }
+
+    private void UpdateConnectionStatus(bool connected)
+    {
+        if (!BluetoothConnectionText) return;
+        BluetoothConnectionText.text = connected ? "Connected" : "Disconnected";
+        BluetoothConnectionText.color = connected ? Color.green : Color.red;
     }
 
     // ---------------- SETTINGS CONTROLS (Keep existing logic) ---------------- //

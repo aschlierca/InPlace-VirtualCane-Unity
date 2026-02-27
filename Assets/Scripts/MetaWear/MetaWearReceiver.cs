@@ -5,6 +5,8 @@ public class MetaWearReceiver : MonoBehaviour
     [Header("Target Controllers")]
     public VirtualCaneController virtualCane;
 
+    public event System.Action<bool> OnConnectionChanged;
+
     private Vector3 latestAccel;
     private Vector3 latestGyro;
     private bool hasAccel;
@@ -24,6 +26,13 @@ public class MetaWearReceiver : MonoBehaviour
         latestGyro = ParseJsonVector(json);
         hasGyro = true;
         ApplyIfReady();
+    }
+
+    // Called from Swift: OnConnectionStatus("connected" | "disconnected")
+    public void OnConnectionStatus(string status)
+    {
+        bool connected = status == "connected";
+        OnConnectionChanged?.Invoke(connected);
     }
 
     private void ApplyIfReady()

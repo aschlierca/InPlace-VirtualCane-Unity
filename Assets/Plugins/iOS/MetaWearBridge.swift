@@ -79,8 +79,10 @@ func UnitySendMessage(_ obj: UnsafePointer<CChar>, _ method: UnsafePointer<CChar
         device.connectAndSetup().continueWith { t in
             if let error = t.error {
                 print("Connection error:", error)
+                self.sendUnityMessage(target: "MetaWearReceiver", method: "OnConnectionStatus", message: "disconnected")
             } else {
                 print("Connected to \(device.peripheral.identifier.uuidString)")
+                self.sendUnityMessage(target: "MetaWearReceiver", method: "OnConnectionStatus", message: "connected")
                 // Example: flash LED to indicate connection
                 var pattern = MblMwLedPattern()
                 mbl_mw_led_load_preset_pattern(&pattern, MBL_MW_LED_PRESET_PULSE)

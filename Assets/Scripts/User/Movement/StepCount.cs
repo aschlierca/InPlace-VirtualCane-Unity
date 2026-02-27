@@ -46,6 +46,8 @@ public class StepCount : MonoBehaviour
             MovePlayer(diff);
             UpdateStepUI();
         }
+
+
 #endif
     }
 
