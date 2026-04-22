@@ -25,44 +25,44 @@ public class LaserAndCaneManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Activate the prefab named cane 
+    /// Activate the prefab named cane
     /// </summary>
     public static void ActivateCane()
     {
-        Cane.SetActive(true);
+        if (Cane != null) Cane.SetActive(true);
     }
 
     /// <summary>
-    /// Deactivate the prefab named cane 
+    /// Deactivate the prefab named cane
     /// </summary>
     public static void DeactivateCane()
     {
-        Cane.SetActive(false);
+        if (Cane != null) Cane.SetActive(false);
     }
 
     /// <summary>
-    /// Activate the prefab named laser 
+    /// Activate the prefab named laser
     /// </summary>
     public static void ActivateLaser()
     {
-        Laser.SetActive(true);
+        if (Laser != null) Laser.SetActive(true);
     }
 
     /// <summary>
-    /// Deactivate the prefab named laser 
+    /// Deactivate the prefab named laser
     /// </summary>
     public static void DeactivateLaser()
     {
-        Laser.SetActive(false);
+        if (Laser != null) Laser.SetActive(false);
     }
 
     public static bool GetCaneActivity()
     {
-        return Cane.activeSelf;
+        return Cane != null && Cane.activeSelf;
     }
 
     public static bool GetLaserActivity()
     {
-        return Laser.activeSelf;
+        return Laser != null && Laser.activeSelf;
     }
 }

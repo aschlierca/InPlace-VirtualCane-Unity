@@ -13,7 +13,6 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI heightText;
 
     [Header("Bluetooth")]
-    public MetaWearReceiver metaWearReceiver;
 
     [Header("Settings Config")]
     public float scaleSize = 0.1f;
@@ -43,16 +42,9 @@ public class UIManager : MonoBehaviour
             BluetoothConnectionText.text = "Disconnected";
             BluetoothConnectionText.color = Color.red;
         }
-
-        if (metaWearReceiver != null)
-            metaWearReceiver.OnConnectionChanged += UpdateConnectionStatus;
     }
 
-    void OnDestroy()
-    {
-        if (metaWearReceiver != null)
-            metaWearReceiver.OnConnectionChanged -= UpdateConnectionStatus;
-    }
+
 
     private void UpdateConnectionStatus(bool connected)
     {
