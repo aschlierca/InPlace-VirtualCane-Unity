@@ -24,6 +24,7 @@ public class StepCount : MonoBehaviour
 
     private int realSteps = 0;     // from pedometer
     private int manualSteps = 0;   // from buttons
+    private int lastSpokenSteps = -1;   // last step total announced via audio
 
     void Start()
     {
@@ -74,6 +75,18 @@ public class StepCount : MonoBehaviour
         int displayedSteps = realSteps + manualSteps;
         if (stepText != null)
             stepText.text = displayedSteps.ToString();
+
+        // Speak the new step count whenever it changes
+        if (displayedSteps != lastSpokenSteps)
+        {
+            lastSpokenSteps = displayedSteps;
+            // Speak the latest count with no delay:
+            //  - allowVoiceOver:false forces the direct AVSpeechSynthesizer path, which
+            //    interrupts instantly. The VoiceOver path posts to iOS's accessibility
+            //    announcement queue, which is delayed and can't be flushed by the app.
+            //  - EInterrupt.All clears any older numbers still queued in UAP itself.
+            UAP_AccessibilityManager.Say(displayedSteps.ToString(), true, false, UAP_AudioQueue.EInterrupt.All);
+        }
     }
 
     private void MovePlayer(int steps)

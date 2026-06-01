@@ -27,10 +27,14 @@ void StartStepCounter() {
         double magnitude = sqrt(x*x + y*y + z*z);
 
         // smooth the signal (low-pass filter)
-        filteredMagnitude = 0.9 * filteredMagnitude + 0.1 * magnitude;
+        // Higher new-sample weight = the filter reacts to a footfall within a
+        // frame or two instead of ramping up over many frames. This removes the
+        // detection lag (which was being perceived as audio lag downstream).
+        filteredMagnitude = 0.6 * filteredMagnitude + 0.4 * magnitude;
 
         // threshold + cooldown
-        double threshold = 1.35; // increase if still too sensitive
+        // Threshold raised to compensate for the more reactive (noisier) filter.
+        double threshold = 1.45; // increase if it now counts extra steps
         double minInterval = 0.45; // seconds between steps
 
         double now = CACurrentMediaTime();
