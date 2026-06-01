@@ -281,16 +281,16 @@ public class UAP_AudioQueue : MonoBehaviour
 						}
 			*/
 #elif (UNITY_STANDALONE_OSX || UNITY_EDITOR) && !UNITY_WEBPLAYER
-		// Initialize Text To Speech for Mac platform - if so desired
-		if (UAP_AccessibilityManager.UseMacOSTTS())
-		{
-			if (MacOSTTS.instance == null)
+			// Initialize Text To Speech for Mac platform - if so desired
+			if (UAP_AccessibilityManager.UseMacOSTTS())
 			{
-				GameObject MacOSTTSObj = new GameObject("MacOS TTS");
-				MacOSTTSObj.AddComponent<MacOSTTS>();
-				MacOSTTSObj.transform.SetParent(this.transform, false);
+				if (MacOSTTS.instance == null)
+				{
+					GameObject MacOSTTSObj = new GameObject("MacOS TTS");
+					MacOSTTSObj.AddComponent<MacOSTTS>();
+					MacOSTTSObj.transform.SetParent(this.transform, false);
+				}
 			}
-		}
 #elif UNITY_ANDROID && !UNITY_EDITOR
 		if (UAP_AccessibilityManager.UseAndroidTTS())
 		{
@@ -530,7 +530,7 @@ public class UAP_AudioQueue : MonoBehaviour
 					else if (m_ActiveEntry.m_TTS_Text.Length > 0)
 					{
 #if UNITY_IOS && !UNITY_EDITOR_WIN
-					m_LastEntryUsedVoiceOver = m_ActiveEntry.m_AllowVoiceOver;
+						m_LastEntryUsedVoiceOver = m_ActiveEntry.m_AllowVoiceOver;
 #endif
 						TTS_Speak(m_ActiveEntry.m_TTS_Text, m_ActiveEntry.m_AllowVoiceOver);
 					}

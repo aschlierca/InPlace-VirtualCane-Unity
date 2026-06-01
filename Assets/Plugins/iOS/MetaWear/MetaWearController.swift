@@ -129,7 +129,6 @@ class MetaWearController {
                 print("   MAC: \(mac)")
             }
             if let info = device.info {
-                print("   Model: \(info.modelDescription)")
                 print("   Hardware: \(info.hardwareRevision)")
                 print("   Firmware: \(info.firmwareRevision)")
             }

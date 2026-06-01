@@ -52,7 +52,7 @@ public class UAP_AccessibilityManager : MonoBehaviour
 	/// As this is a standard accessibility feature on smart phones,
 	/// do not turn this off unless you have a good reason.</value>
 	public bool m_ExploreByTouch = true;
-	private float m_ExploreByTouchDelay = 0.75f;
+	private float m_ExploreByTouchDelay = 0.2f; // was 0.75f - reduced to start reading the touched element sooner
 
 	/// <summary>
 	/// Reads out disabled but visible interactive UI elements.
@@ -81,10 +81,12 @@ public class UAP_AccessibilityManager : MonoBehaviour
 	public bool m_DebugOutput = false;
 
 	/// <value>How many seconds after selecting a UI element will the usage hint be triggered.</value>
-	float m_HintDelay = 0.6f;
-	float m_DisabledDelay = 0.2f;
-	float m_ValueDelay = 0.25f;
-	float m_TypeDelay = 1.0f;
+	// Minimized inter-segment pauses to reduce perceived TTS delay.
+	// (Originals: hint 0.6, disabled 0.2, value 0.25, type 1.0)
+	float m_HintDelay = 0.15f;
+	float m_DisabledDelay = 0.05f;
+	float m_ValueDelay = 0.1f;
+	float m_TypeDelay = 0.15f;
 
 	public bool m_WindowsUseMouseSwipes = false;
 	// This setting will become obsolete
@@ -2602,6 +2604,23 @@ public class UAP_AccessibilityManager : MonoBehaviour
 					// No screen touch since, so we're safe from a double tap
 					// Treat it like a single tap
 					ExploreByTouch_SelectElementUnderFinger(GetTouchPosition());
+
+					// Single-tap activation: a clean tap (not a drag-explore) both selects
+					// and activates the element under the finger, so users no longer have to
+					// double tap. InteractWithElement safely ignores non-interactable items
+					// (e.g. labels), so those are just read aloud.
+					if (m_CurrentItem != null && m_CurrentItem.m_Object.IsInteractable())
+					{
+						if (m_CurrentElementHasSoleFocus && !UAP_VirtualKeyboard.IsOpen())
+						{
+							m_CurrentItem.m_Object.InteractEnd();
+							LeaveFocussedItem();
+						}
+						else
+						{
+							InteractWithElement(m_CurrentItem);
+						}
+					}
 
 					// This can no longer be a swipe, so cancel all swipes
 					m_SwipeActive = false;
