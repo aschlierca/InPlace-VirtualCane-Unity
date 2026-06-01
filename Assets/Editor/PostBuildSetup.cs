@@ -54,6 +54,12 @@ public class PostBuildSetup
         root.SetString("NSCameraUsageDescription", "This app uses motion data to track steps and device movement.");
         root.SetString("NSMotionUsageDescription", "");
 
+        // --- Background modes ---
+        // Required by CoreBluetooth state restoration (MetaWearScanner.sharedRestore).
+        // Without "bluetooth-central", CBCentralManager throws on init and the app crashes.
+        PlistElementArray bgModes = root.CreateArray("UIBackgroundModes");
+        bgModes.AddString("bluetooth-central");
+
         // --- File sharing ---
         root.SetBoolean("UIFileSharingEnabled", true);
 
