@@ -123,9 +123,6 @@ public class SensorDataReceiver : MonoBehaviour
             if (caneController != null)
                 caneController.ApplySensorData(p);
 
-            if (graph != null)
-                graph.AddPoint(p);
-
             if (logger != null)
                 logger.Log(p);
 
@@ -136,7 +133,7 @@ public class SensorDataReceiver : MonoBehaviour
             // Update debug info periodically
             if (packetCount % 100 == 0)
             {
-                UpdateDebugText($"✅ Receiving data\nPackets: {packetCount}\nAccel: ({p.ax:F2}, {p.ay:F2}, {p.az:F2})\nGyro: ({p.gx:F2}, {p.gy:F2}, {p.gz:F2})");
+                UpdateDebugText($"Receiving data\nPackets: {packetCount}\nAccel: ({p.ax:F2}, {p.ay:F2}, {p.az:F2})\nGyro: ({p.gx:F2}, {p.gy:F2}, {p.gz:F2})");
             }
         }
         catch (System.Exception e)

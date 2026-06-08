@@ -172,7 +172,7 @@ class MetaWearController {
             return
         }
 
-        print("📊 Starting sensor streaming...")
+        print("Starting sensor streaming...")
         startAccelerometer(board: board)
         startGyroscope(board: board)
         print("Streaming started")

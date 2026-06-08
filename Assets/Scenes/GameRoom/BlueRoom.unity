@@ -3560,7 +3560,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be01bd422531c8648956f0085df5e311, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BluetoothConnectionText: {fileID: 0}
+  BluetoothConnectionText: {fileID: 565545907}
   volumeSlider: {fileID: 1363043450}
   hapticsSlider: {fileID: 2038819697}
   sensitivitySlider: {fileID: 1011407970}

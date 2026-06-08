@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public class SensorGraph : MonoBehaviour
 {
+    /*
     public LineRenderer accelX;
     public LineRenderer accelY;
     public LineRenderer accelZ;
@@ -57,4 +58,5 @@ public class SensorGraph : MonoBehaviour
             lr.SetPosition(i, new Vector3(i * 0.05f, arr[i], 0));
         }
     }
+    */
 }
