@@ -26,9 +26,9 @@ public class CaneController : MonoBehaviour
             hasData = true;
         }
 
-        Vector3 gyro = new Vector3(p.gx, -p.gy, -p.gz);
+        Vector3 gyro = new Vector3(p.gx, 0f, p.gz);
         float scale = calibration.GetMovementScale();
-        Quaternion delta = Quaternion.Euler(gyro * scale * Time.deltaTime * Mathf.Rad2Deg);
+        Quaternion delta = Quaternion.Euler(gyro * scale * Time.deltaTime);
         targetRotation = targetRotation * delta;
     }
 

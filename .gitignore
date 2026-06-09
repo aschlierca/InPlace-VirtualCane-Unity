@@ -76,3 +76,5 @@ crashlytics-build.properties
 
 # Firebase/Google plist
 /Assets/GoogleService-Info.plist
+
+CLAUDE.md
