@@ -8,12 +8,16 @@ public class CaneController : MonoBehaviour
     public Transform gripPoint;          // child Transform at the grip position; assign in Inspector
 
     private Quaternion targetRotation = Quaternion.identity;
+    private Quaternion initialRotation = Quaternion.identity;
     public float smoothSpeed = 10f;
+    [Range(0.01f, 1f)]
+    public float sensitivity = 0.1f;
 
     private bool hasData = false;   // stays false until real sensor data arrives (e.g. in editor with no device)
 
     void Awake()
     {
+        initialRotation = transform.rotation;
         targetRotation = transform.rotation;
     }
 
@@ -26,10 +30,24 @@ public class CaneController : MonoBehaviour
             hasData = true;
         }
 
-        Vector3 gyro = new Vector3(p.gx, 0f, p.gz);
-        float scale = calibration.GetMovementScale();
-        Quaternion delta = Quaternion.Euler(gyro * scale * Time.deltaTime);
-        targetRotation = targetRotation * delta;
+        float scale = calibration.GetMovementScale() * sensitivity;
+        float dt = Time.deltaTime;
+
+        // gy: local tilt of the cane (pitch/roll in the cane's own frame)
+        Quaternion localDelta = Quaternion.Euler(0, -p.gy * scale * dt, 0);
+        targetRotation = targetRotation * localDelta;
+
+        // gz: horizontal sweep — world-Y yaw centred at the grip point.
+        // The grip-point compensation in Update() keeps the pivot pinned there,
+        // so this makes the cane tip arc left/right instead of spinning in place.
+        Quaternion worldYaw = Quaternion.Euler(0, -p.gz * scale * dt, 0);
+        targetRotation = worldYaw * targetRotation;
+    }
+
+    public void ResetCane()
+    {
+        targetRotation = initialRotation;
+        hasData = false;
     }
 
     void Update()
