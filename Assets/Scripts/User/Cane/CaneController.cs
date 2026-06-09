@@ -14,11 +14,15 @@ public class CaneController : MonoBehaviour
     public float sensitivity = 0.1f;
 
     private bool hasData = false;   // stays false until real sensor data arrives (e.g. in editor with no device)
+    private Camera headCamera;
+    private float initialCameraYaw;
 
     void Awake()
     {
-        initialRotation = transform.rotation;
-        targetRotation = transform.rotation;
+        headCamera       = Camera.main;
+        initialCameraYaw = headCamera != null ? headCamera.transform.eulerAngles.y : 0f;
+        initialRotation  = transform.rotation;
+        targetRotation   = transform.rotation;
     }
 
     public void ApplySensorData(SensorPacket p)
@@ -31,9 +35,13 @@ public class CaneController : MonoBehaviour
         }
 
         float scale = calibration.GetMovementScale() * sensitivity;
-        float dt = Time.deltaTime;
+        float dt    = Time.deltaTime;
 
-        // gy: local tilt of the cane (pitch/roll in the cane's own frame)
+        // gx: vertical tilt — cane tip raises/lowers from the grip point
+        Quaternion verticalTilt = Quaternion.Euler(-p.gx * scale * dt, 0, 0);
+        targetRotation = targetRotation * verticalTilt;
+
+        // gy: local tilt in the cane's own frame (side-lean)
         Quaternion localDelta = Quaternion.Euler(0, -p.gy * scale * dt, 0);
         targetRotation = targetRotation * localDelta;
 
@@ -44,10 +52,18 @@ public class CaneController : MonoBehaviour
         targetRotation = worldYaw * targetRotation;
     }
 
+    // Align the cane to the user's current head direction.
+    // Because the sensor only tracks relative gyro deltas, the cane drifts away
+    // from the head's forward over time. ResetCane() computes how much the camera
+    // has yawed since the scene started and applies that same offset to the initial
+    // cane pose, so the cane re-centres to wherever the user is looking.
     public void ResetCane()
     {
-        targetRotation = initialRotation;
-        hasData = false;
+        float yawOffset = headCamera != null
+            ? headCamera.transform.eulerAngles.y - initialCameraYaw
+            : 0f;
+        targetRotation = Quaternion.Euler(0, yawOffset, 0) * initialRotation;
+        // leave hasData unchanged — Update() keeps slerping smoothly to the centred pose
     }
 
     void Update()
