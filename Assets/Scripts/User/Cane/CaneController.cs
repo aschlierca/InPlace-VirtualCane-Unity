@@ -5,71 +5,84 @@ using Vector3 = UnityEngine.Vector3;
 public class CaneController : MonoBehaviour
 {
     public HeightCalibration calibration;
-    public Transform gripPoint;          // child Transform at the grip position; assign in Inspector
+    public Transform gripPoint;
 
     private Quaternion targetRotation = Quaternion.identity;
     private Quaternion initialRotation = Quaternion.identity;
     public float smoothSpeed = 10f;
+    [Range(0.01f, 5f)]
+    public float sensitivity = 50.0f;
+    [Tooltip("Additional multiplier on vertical tilt (gy) — lower to reduce up/down sensitivity")]
     [Range(0.01f, 1f)]
-    public float sensitivity = 0.1f;
+    public float verticalSensitivity = 0.3f;
 
-    private bool hasData = false;   // stays false until real sensor data arrives (e.g. in editor with no device)
+    [Header("Drift Correction")]
+    [Tooltip("Proportional gain for yaw drift toward camera-forward while idle")]
+    [Range(0f, 5f)]
+    public float yawDriftRate = 0.5f;
+    [Tooltip("Rate at which pitch springs back to initial downward angle while idle")]
+    [Range(0f, 5f)]
+    public float pitchDriftRate = 0.3f;
+    [Tooltip("Gyro magnitude (deg/s) below which the cane is treated as stationary")]
+    [Range(0.05f, 2f)]
+    public float idleGyroThreshold = 0.15f;
+
+    private bool hasData = false;
     private Camera headCamera;
     private float initialCameraYaw;
 
     void Awake()
     {
-        headCamera       = Camera.main;
+        headCamera = Camera.main;
         initialCameraYaw = headCamera != null ? headCamera.transform.eulerAngles.y : 0f;
-        initialRotation  = transform.rotation;
-        targetRotation   = transform.rotation;
+        initialRotation = transform.rotation;
+        targetRotation = transform.rotation;
     }
 
     public void ApplySensorData(SensorPacket p)
     {
         if (!hasData)
         {
-            // seed from the cane's current pose so the first packet doesn't snap
             targetRotation = transform.rotation;
             hasData = true;
         }
 
         float scale = calibration.GetMovementScale() * sensitivity;
-        float dt    = Time.deltaTime;
+        float dt = Time.deltaTime;
+        float gyroMag = new Vector3(p.gx, p.gy, p.gz).magnitude;
 
-        // gx: vertical tilt — cane tip raises/lowers from the grip point
-        Quaternion verticalTilt = Quaternion.Euler(-p.gx * scale * dt, 0, 0);
-        targetRotation = targetRotation * verticalTilt;
+        if (gyroMag >= idleGyroThreshold)
+        {
+            // gy: vertical tilt with its own lower sensitivity
+            targetRotation *= Quaternion.Euler(p.gy * scale * verticalSensitivity * dt, 0, 0);
+            // gz: horizontal sweep — world-Y yaw centred at the grip point
+            targetRotation = Quaternion.Euler(0, -p.gz * scale * dt, 0) * targetRotation;
+        }
+        else
+        {
+            // Yaw spring: drift toward camera-forward.
+            // Uses forward-vector XZ projection — stable at large downward pitch angles.
+            float cameraYaw = headCamera != null ? headCamera.transform.eulerAngles.y : 0f;
+            Vector3 targetFwd = targetRotation * Vector3.forward;
+            float currentYaw = Mathf.Atan2(targetFwd.x, targetFwd.z) * Mathf.Rad2Deg;
+            Vector3 initialFwd = initialRotation * Vector3.forward;
+            float initialYaw = Mathf.Atan2(initialFwd.x, initialFwd.z) * Mathf.Rad2Deg;
+            float neutralYawDeg = initialYaw + (cameraYaw - initialCameraYaw);
+            float yawError = Mathf.DeltaAngle(currentYaw, neutralYawDeg);
+            targetRotation = Quaternion.Euler(0, yawError * yawDriftRate * dt, 0) * targetRotation;
 
-        // gy: local tilt in the cane's own frame (side-lean)
-        Quaternion localDelta = Quaternion.Euler(0, -p.gy * scale * dt, 0);
-        targetRotation = targetRotation * localDelta;
-
-        // gz: horizontal sweep — world-Y yaw centred at the grip point.
-        // The grip-point compensation in Update() keeps the pivot pinned there,
-        // so this makes the cane tip arc left/right instead of spinning in place.
-        Quaternion worldYaw = Quaternion.Euler(0, -p.gz * scale * dt, 0);
-        targetRotation = worldYaw * targetRotation;
-    }
-
-    // Align the cane to the user's current head direction.
-    // Because the sensor only tracks relative gyro deltas, the cane drifts away
-    // from the head's forward over time. ResetCane() computes how much the camera
-    // has yawed since the scene started and applies that same offset to the initial
-    // cane pose, so the cane re-centres to wherever the user is looking.
-    public void ResetCane()
-    {
-        float yawOffset = headCamera != null
-            ? headCamera.transform.eulerAngles.y - initialCameraYaw
-            : 0f;
-        targetRotation = Quaternion.Euler(0, yawOffset, 0) * initialRotation;
-        // leave hasData unchanged — Update() keeps slerping smoothly to the centred pose
+            // Pitch spring: drift back toward the initial downward angle.
+            // Decomposes targetRotation into yaw * pitch so both axes correct independently.
+            Quaternion neutralYawQ = Quaternion.Euler(0, neutralYawDeg, 0);
+            Quaternion initialYawQ = Quaternion.Euler(0, initialYaw, 0);
+            Quaternion pitchCurrent = Quaternion.Inverse(neutralYawQ) * targetRotation;
+            Quaternion pitchInitial = Quaternion.Inverse(initialYawQ) * initialRotation;
+            targetRotation = neutralYawQ * Quaternion.Slerp(pitchCurrent, pitchInitial, pitchDriftRate * dt);
+        }
     }
 
     void Update()
     {
-        // Don't touch the transform until sensor data is streaming; otherwise we
-        // fight whatever movement script is driving the cane (UserMovement_Editor, etc.)
         if (!hasData)
             return;
 
