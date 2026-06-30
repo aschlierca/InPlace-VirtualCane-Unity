@@ -92,10 +92,32 @@ Always open the CocoaPods workspace instead of the Xcode project:
 Unity-iPhone.xcworkspace
 ```
 
-
 ## Build and Run
 
 1. Open `Unity-iPhone.xcworkspace`.
 2. Select your iOS device as the build target.
 3. Configure Signing & Capabilities with your Apple Developer account.
 4. Build and run the project from Xcode.
+
+# Developer's Guide
+
+iPhone (Swift iOS App)
+├── MetaWear BLE Layer — Scan, connect, stream sensor data
+├── Native Plugin Bridge — Expose Swift data to Unity via C interop
+└── Unity iOS Plugin — UnitySendMessage → Unity C# layer
+
+Unity (C# App, iOS target)
+├── Assets/Plugins/iOS/MetaWear/
+│ ├── MetaWearController.swift — BLE scanning + streaming
+│ ├── BridgeHelper.swift  
+ │ ├── MetaWearBridge.swift — @\_cdecl C-callable exports
+│ └── MetaWearBridge.h — Objective-C header for Unity
+├── Assets/Scripts/MetaWear/
+│ ├── SensorGraph.cs — Real-time X/Y/Z line graphs
+│ ├── HeightCalibration.cs — Height-based threshold scaling
+│ ├── DataLogger.cs — CSV logging to persistentDataPath
+│ ├── SensorDataReceiver.cs — Receives JSON from iOS plugin
+│ └── SensorPacket.cs  
+ └── Assets/Scripts/User/Cane/
+│ ├── CaneController.cs — Drives virtual cane transform
+│ └── CaneContact.cs
