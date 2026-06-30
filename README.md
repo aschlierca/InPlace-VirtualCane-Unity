@@ -101,23 +101,54 @@ Unity-iPhone.xcworkspace
 
 # Developer's Guide
 
-iPhone (Swift iOS App)
-├── MetaWear BLE Layer — Scan, connect, stream sensor data
-├── Native Plugin Bridge — Expose Swift data to Unity via C interop
-└── Unity iOS Plugin — UnitySendMessage → Unity C# layer
+## Project Architecture
 
-Unity (C# App, iOS target)
-├── Assets/Plugins/iOS/MetaWear/
-│ ├── MetaWearController.swift — BLE scanning + streaming
-│ ├── BridgeHelper.swift  
- │ ├── MetaWearBridge.swift — @\_cdecl C-callable exports
-│ └── MetaWearBridge.h — Objective-C header for Unity
-├── Assets/Scripts/MetaWear/
-│ ├── SensorGraph.cs — Real-time X/Y/Z line graphs
-│ ├── HeightCalibration.cs — Height-based threshold scaling
-│ ├── DataLogger.cs — CSV logging to persistentDataPath
-│ ├── SensorDataReceiver.cs — Receives JSON from iOS plugin
-│ └── SensorPacket.cs  
- └── Assets/Scripts/User/Cane/
-│ ├── CaneController.cs — Drives virtual cane transform
-│ └── CaneContact.cs
+```text
+iPhone (Swift iOS App)
+│
+├── MetaWear BLE Layer
+│   ├── Scans for MetaWear devices
+│   ├── Connects over Bluetooth Low Energy (BLE)
+│   └── Streams accelerometer and gyroscope data
+│
+├── Native Plugin Bridge
+│   └── Exposes Swift functions to Unity using C interoperability
+│
+└── Unity iOS Plugin
+    └── Sends sensor data to Unity through UnitySendMessage()
+```
+
+```text
+Unity (C# App - iOS Target)
+│
+├── Assets/
+│   ├── Plugins/
+│   │   └── iOS/
+│   │       └── MetaWear/
+│   │           ├── MetaWearController.swift
+│   │           │   └── BLE scanning, connection, and sensor streaming
+│   │           ├── BridgeHelper.swift
+│   │           ├── MetaWearBridge.swift
+│   │           │   └── @_cdecl functions exposed to Unity
+│   │           └── MetaWearBridge.h
+│   │               └── Objective-C bridge header
+│   │
+│   └── Scripts/
+│       ├── MetaWear/
+│       │   ├── SensorGraph.cs
+│       │   │   └── Real-time X/Y/Z sensor graphs
+│       │   ├── HeightCalibration.cs
+│       │   │   └── Height-based threshold calibration
+│       │   ├── DataLogger.cs
+│       │   │   └── Saves CSV files to persistentDataPath
+│       │   ├── SensorDataReceiver.cs
+│       │   │   └── Receives JSON messages from the iOS plugin
+│       │   └── SensorPacket.cs
+│       │
+│       └── User/
+│           └── Cane/
+│               ├── CaneController.cs
+│               │   └── Controls the virtual cane movement
+│               └── CaneContact.cs
+│                   └── Handles cane collision/contact detection
+```
