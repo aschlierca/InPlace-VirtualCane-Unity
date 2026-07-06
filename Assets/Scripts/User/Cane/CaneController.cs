@@ -1,96 +1,101 @@
 using UnityEngine;
-using Quaternion = UnityEngine.Quaternion;
-using Vector3 = UnityEngine.Vector3;
 
+// Drives the virtual cane from the MetaWear on-board sensor-fusion
+// quaternion (absolute orientation), instead of integrating raw gyro rates.
+//
+// Design:
+//   target = caneRefRotation * mountOffset⁻¹ * (sensorRef⁻¹ * sensorNow) * mountOffset
+//
+// i.e. the sensor's rotation *since calibration*, expressed in the cane's
+// body frame, applied to the cane's calibrated pose. This makes physical
+// pointing map 1:1 to virtual pointing, with no gain constants, no dt, and
+// no drift springs.
+//
+// Calibration: hold the physical cane in the normal grip pose pointing
+// straight ahead, then call Recalibrate() (wire it to a UI button and/or a
+// voice command). Auto-calibrates on the first packet as a fallback.
 public class CaneController : MonoBehaviour
 {
     public HeightCalibration calibration;
     public Transform gripPoint;
 
-    private Quaternion targetRotation = Quaternion.identity;
-    private Quaternion initialRotation = Quaternion.identity;
-    public float smoothSpeed = 10f;
-    [Range(0.01f, 5f)]
-    public float sensitivity = 50.0f;
-    [Tooltip("Additional multiplier on vertical tilt (gy) — lower to reduce up/down sensitivity")]
-    [Range(0.01f, 1f)]
-    public float verticalSensitivity = 0.3f;
+    [Header("Smoothing")]
+    [Tooltip("Slerp rate toward the sensor pose. 15-25 is responsive; lower adds lag but hides BLE jitter.")]
+    public float smoothSpeed = 20f;
 
-    [Header("Drift Correction")]
-    [Tooltip("Proportional gain for yaw drift toward camera-forward while idle")]
-    [Range(0f, 5f)]
-    public float yawDriftRate = 0.5f;
-    [Tooltip("Rate at which pitch springs back to initial downward angle while idle")]
-    [Range(0f, 5f)]
-    public float pitchDriftRate = 0.3f;
-    [Tooltip("Gyro magnitude (deg/s) below which the cane is treated as stationary")]
-    [Range(0.05f, 2f)]
-    public float idleGyroThreshold = 0.15f;
+    [Header("Mounting")]
+    [Tooltip("Fixed rotation from the sensor's body axes to the cane's body axes. " +
+             "Leave zero if the board is mounted flat on top of the shaft, X along the shaft. " +
+             "If sweep/dip axes come out swapped or tilted, adjust this once (multiples of 90 usually).")]
+    public Vector3 mountOffsetEuler = Vector3.zero;
 
+    private Quaternion mountOffset = Quaternion.identity;
+
+    // State
+    private Quaternion sensorNow = Quaternion.identity;  // sensor orientation in Unity axes
+    private Quaternion sensorRef = Quaternion.identity;  // sensor orientation at calibration
+    private Quaternion caneRef   = Quaternion.identity;  // cane world rotation at calibration
     private bool hasData = false;
-    private Camera headCamera;
-    private float initialCameraYaw;
+    private bool calibrated = false;
 
     void Awake()
     {
-        headCamera = Camera.main;
-        initialCameraYaw = headCamera != null ? headCamera.transform.eulerAngles.y : 0f;
-        initialRotation = transform.rotation;
-        targetRotation = transform.rotation;
+        caneRef = transform.rotation;
+        mountOffset = Quaternion.Euler(mountOffsetEuler);
     }
 
-    public void ApplySensorData(SensorPacket p)
+    void OnValidate()
     {
+        mountOffset = Quaternion.Euler(mountOffsetEuler);
+    }
+
+    // Called by SensorDataReceiver with the fused quaternion from the board.
+    // MetaWear fusion output is right-handed (Z-up Earth frame); Unity is
+    // left-handed Y-up. Swap the Y/Z components and negate w.
+    //
+    // If, during the axis check (see Recalibrate docs), a physical rotation
+    // produces the *reverse* virtual rotation on one axis, try negating that
+    // single component below (e.g. -x) rather than changing mountOffset.
+    public void ApplyQuaternion(float w, float x, float y, float z)
+    {
+        sensorNow = new Quaternion(x, z, y, -w);
+
         if (!hasData)
         {
-            targetRotation = transform.rotation;
             hasData = true;
+            Recalibrate(); // fallback; a deliberate button press is better
         }
+    }
 
-        float scale = calibration.GetMovementScale() * sensitivity;
-        float dt = Time.deltaTime;
-        float gyroMag = new Vector3(p.gx, p.gy, p.gz).magnitude;
-
-        if (gyroMag >= idleGyroThreshold)
-        {
-            // gy: vertical tilt with its own lower sensitivity
-            targetRotation *= Quaternion.Euler(p.gy * scale * verticalSensitivity * dt, 0, 0);
-            // gz: horizontal sweep — world-Y yaw centred at the grip point
-            targetRotation = Quaternion.Euler(0, -p.gz * scale * dt, 0) * targetRotation;
-        }
-        else
-        {
-            // Yaw spring: drift toward camera-forward.
-            // Uses forward-vector XZ projection — stable at large downward pitch angles.
-            float cameraYaw = headCamera != null ? headCamera.transform.eulerAngles.y : 0f;
-            Vector3 targetFwd = targetRotation * Vector3.forward;
-            float currentYaw = Mathf.Atan2(targetFwd.x, targetFwd.z) * Mathf.Rad2Deg;
-            Vector3 initialFwd = initialRotation * Vector3.forward;
-            float initialYaw = Mathf.Atan2(initialFwd.x, initialFwd.z) * Mathf.Rad2Deg;
-            float neutralYawDeg = initialYaw + (cameraYaw - initialCameraYaw);
-            float yawError = Mathf.DeltaAngle(currentYaw, neutralYawDeg);
-            targetRotation = Quaternion.Euler(0, yawError * yawDriftRate * dt, 0) * targetRotation;
-
-            // Pitch spring: drift back toward the initial downward angle.
-            // Decomposes targetRotation into yaw * pitch so both axes correct independently.
-            Quaternion neutralYawQ = Quaternion.Euler(0, neutralYawDeg, 0);
-            Quaternion initialYawQ = Quaternion.Euler(0, initialYaw, 0);
-            Quaternion pitchCurrent = Quaternion.Inverse(neutralYawQ) * targetRotation;
-            Quaternion pitchInitial = Quaternion.Inverse(initialYawQ) * initialRotation;
-            targetRotation = neutralYawQ * Quaternion.Slerp(pitchCurrent, pitchInitial, pitchDriftRate * dt);
-        }
+    // Zero the mapping: the cane's CURRENT physical pose is declared to be
+    // its current virtual pose. Have the user hold the cane in the standard
+    // grip, pointing straight ahead, then trigger this.
+    //
+    // In IMU_PLUS fusion mode yaw drifts slowly (order of degrees per
+    // minute), so expose this on a button and recalibrate between trials.
+    public void Recalibrate()
+    {
+        sensorRef = sensorNow;
+        caneRef = transform.rotation;
+        calibrated = true;
+        Debug.Log("[CaneController] Calibrated: sensor pose latched as reference.");
     }
 
     void Update()
     {
-        if (!hasData)
+        if (!calibrated)
             return;
 
+        // Rotation since calibration, expressed in the cane's body frame.
+        Quaternion deltaBody = Quaternion.Inverse(sensorRef) * sensorNow;
+        Quaternion target = caneRef * (Quaternion.Inverse(mountOffset) * deltaBody * mountOffset);
+
+        // Rotate about the grip point rather than the transform origin.
         Vector3 gripBefore = gripPoint.position;
 
         transform.rotation = Quaternion.Slerp(
             transform.rotation,
-            targetRotation,
+            target,
             smoothSpeed * Time.deltaTime
         );
 
