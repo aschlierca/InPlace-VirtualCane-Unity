@@ -1,5 +1,8 @@
 using UnityEngine;
 
+// Cane orientation from MetaWear fused quaternion.
+// Guided 3-motion calibration measures the sensor->cane axis mapping;
+// FLIP toggles global rotation direction (chirality) and persists.
 public class CaneController : MonoBehaviour
 {
     public HeightCalibration calibration;
@@ -8,56 +11,48 @@ public class CaneController : MonoBehaviour
     [Header("Smoothing")]
     public float smoothSpeed = 20f;
 
-    [Header("Mounting")]
-    public Vector3 mountOffsetEuler = Vector3.zero;
-    private Quaternion mountOffset = Quaternion.identity;
+    // ---- calibration state (persisted) ----
+    private Quaternion axisMap = Quaternion.identity;
+    private int chirality = 1;
 
-    // --- Candidate sensor->Unity frame conversions. Cycle with the MAP button. ---
-    private int mapIndex = 0;
-    private static readonly string[] mapLabels = {
-        "A (-y, z, x, -w)", "B (y, z, x, -w)", "C (y, -z, x, -w)", "D (-y, -z, x, w)",
-        "E (x, z, y, -w)",  "F (x, y, z, w)",  "G (-x, -y, z, w)", "H (x, z, y, w)"
-    };
-
-    private Quaternion Convert(float w, float x, float y, float z)
-    {
-        switch (mapIndex)
-        {
-            case 0:  return new Quaternion(-y,  z,  x, -w);
-            case 1:  return new Quaternion( y,  z,  x, -w);
-            case 2:  return new Quaternion( y, -z,  x, -w);
-            case 3:  return new Quaternion(-y, -z,  x,  w);
-            case 4:  return new Quaternion( x,  z,  y, -w);
-            case 5:  return new Quaternion( x,  y,  z,  w);
-            case 6:  return new Quaternion(-x, -y,  z,  w);
-            default: return new Quaternion( x,  z,  y,  w);
-        }
-    }
-
-    // State
+    // ---- runtime state ----
     private Quaternion sensorNow = Quaternion.identity;
     private Quaternion sensorRef = Quaternion.identity;
-    private Quaternion caneRef   = Quaternion.identity;
-    private float lw, lx, ly, lz;              // latest raw values, so re-zero works instantly
+    private Quaternion caneRef = Quaternion.identity;
     private bool hasData = false;
     private bool calibrated = false;
+
+    // ---- wizard state ----
+    private int calStep = -1;
+    private Quaternion q0, q1, q2, q3;
+    private string status = "";
+
+    private static readonly string[] calMsgs = {
+        "1/5  Hold board FLAT, logo up,\nUSB toward you. Keep still.\nTap CAPTURE.",
+        "2/5  Tip it NOSE-DOWN 90\n(far edge to the floor).\nTap CAPTURE.",
+        "3/5  Back to flat-forward, then\nSPIN RIGHT 90 (stay flat).\nTap CAPTURE.",
+        "4/5  Back to flat-forward, then\nTWIST CLOCKWISE 90\n(roll it like a throttle).\nTap CAPTURE.",
+        "5/5  Return to flat-forward.\nTap FINISH."
+    };
 
     void Awake()
     {
         caneRef = transform.rotation;
-        mountOffset = Quaternion.Euler(mountOffsetEuler);
+        if (PlayerPrefs.HasKey("cane_map_w"))
+        {
+            axisMap = new Quaternion(
+                PlayerPrefs.GetFloat("cane_map_x"), PlayerPrefs.GetFloat("cane_map_y"),
+                PlayerPrefs.GetFloat("cane_map_z"), PlayerPrefs.GetFloat("cane_map_w"));
+            chirality = PlayerPrefs.GetInt("cane_chir", 1);
+            status = "Loaded saved calibration. chir=" + chirality;
+        }
+        else status = "Not calibrated - tap CAL.";
     }
 
     public void ApplyQuaternion(float w, float x, float y, float z)
     {
-        lw = w; lx = x; ly = y; lz = z;
-        sensorNow = Convert(w, x, y, z);
-
-        if (!hasData)
-        {
-            hasData = true;
-            Recalibrate();
-        }
+        sensorNow = new Quaternion(-x, -y, z, w);
+        if (!hasData) { hasData = true; Recalibrate(); }
     }
 
     public void Recalibrate()
@@ -65,38 +60,107 @@ public class CaneController : MonoBehaviour
         sensorRef = sensorNow;
         caneRef = transform.rotation;
         calibrated = true;
-        Debug.Log("[CaneController] Calibrated (mapping " + mapLabels[mapIndex] + ")");
-    }
-
-    private void NextMapping()
-    {
-        mapIndex = (mapIndex + 1) % mapLabels.Length;
-        sensorNow = Convert(lw, lx, ly, lz);
-        Recalibrate();   // fresh zero at the moment of switching
     }
 
     void Update()
     {
-        if (!calibrated) return;
+        if (!calibrated || calStep >= 0) return;
 
-        Quaternion deltaBody = Quaternion.Inverse(sensorRef) * sensorNow;
-        Quaternion target = caneRef * (Quaternion.Inverse(mountOffset) * deltaBody * mountOffset);
+        Quaternion delta = Quaternion.Inverse(sensorRef) * sensorNow;
+        if (chirality < 0) delta = Quaternion.Inverse(delta);
+        Quaternion corrected = axisMap * delta * Quaternion.Inverse(axisMap);
+        Quaternion target = caneRef * corrected;
 
         Vector3 gripBefore = gripPoint.position;
         transform.rotation = Quaternion.Slerp(transform.rotation, target, smoothSpeed * Time.deltaTime);
         transform.position += gripBefore - gripPoint.position;
     }
 
+    private static Vector3 DeltaAxis(Quaternion from, Quaternion to, out float angle)
+    {
+        Quaternion d = Quaternion.Inverse(from) * to;
+        d.ToAngleAxis(out angle, out Vector3 axis);
+        if (angle > 180f) { angle = 360f - angle; axis = -axis; }
+        return axis.normalized;
+    }
+
+    private void FinishCalibration()
+    {
+        Vector3 aRight = DeltaAxis(q0, q1, out float ang1);
+        Vector3 aUp    = DeltaAxis(q0, q2, out float ang2);
+        Vector3 aFwd   = DeltaAxis(q0, q3, out float ang3);
+
+        bool angleOk = ang1 > 45f && ang1 < 135f && ang2 > 45f && ang2 < 135f && ang3 > 45f && ang3 < 135f;
+
+        if (Vector3.Dot(Vector3.Cross(aRight, aUp), aFwd) < 0f)
+        { chirality = -1; aRight = -aRight; aUp = -aUp; aFwd = -aFwd; }
+        else chirality = 1;
+
+        Vector3 r = aRight.normalized;
+        Vector3 u = (aUp - Vector3.Dot(aUp, r) * r).normalized;
+        Vector3 f = Vector3.Cross(r, u);
+
+        axisMap = Quaternion.Inverse(Quaternion.LookRotation(f, u));
+
+        PlayerPrefs.SetFloat("cane_map_x", axisMap.x);
+        PlayerPrefs.SetFloat("cane_map_y", axisMap.y);
+        PlayerPrefs.SetFloat("cane_map_z", axisMap.z);
+        PlayerPrefs.SetFloat("cane_map_w", axisMap.w);
+        PlayerPrefs.SetInt("cane_chir", chirality);
+        PlayerPrefs.Save();
+
+        status = (angleOk ? "Calibrated. " : "Calibrated (angles off - redo CAL if sloppy). ")
+                 + "chir=" + chirality;
+        Debug.Log("[CaneController] " + status);
+        Recalibrate();
+    }
+
     void OnGUI()
     {
-        float bw = Screen.width * 0.42f, bh = Screen.height * 0.09f;
-        GUI.skin.button.fontSize = (int)(bh * 0.3f);
+        float W = Screen.width, H = Screen.height;
+        float bh = H * 0.085f;
+        GUI.skin.button.fontSize = (int)(bh * 0.32f);
+        GUI.skin.label.fontSize  = (int)(bh * 0.30f);
+        GUI.skin.box.fontSize    = (int)(bh * 0.28f);
 
-        if (GUI.Button(new Rect(Screen.width * 0.04f, Screen.height - bh * 1.3f, bw, bh),
-                       "MAP " + (mapIndex + 1) + "/8\n" + mapLabels[mapIndex]))
-            NextMapping();
+        if (calStep < 0)
+        {
+            GUI.Box(new Rect(10, 10, W * 0.6f, bh * 0.7f), status);
 
-        if (GUI.Button(new Rect(Screen.width * 0.54f, Screen.height - bh * 1.3f, bw, bh), "ZERO"))
-            Recalibrate();
+            if (GUI.Button(new Rect(W * 0.04f, H - bh * 1.3f, W * 0.28f, bh), "ZERO"))
+                Recalibrate();
+
+            if (GUI.Button(new Rect(W * 0.36f, H - bh * 1.3f, W * 0.28f, bh), "CAL"))
+                calStep = 0;
+
+            if (GUI.Button(new Rect(W * 0.68f, H - bh * 1.3f, W * 0.28f, bh), "FLIP"))
+            {
+                chirality = -chirality;
+                PlayerPrefs.SetInt("cane_chir", chirality);
+                PlayerPrefs.Save();
+                Recalibrate();
+                status = "Direction flipped. chir=" + chirality;
+            }
+            return;
+        }
+
+        GUI.Box(new Rect(W * 0.05f, H * 0.25f, W * 0.9f, bh * 2.4f), calMsgs[calStep]);
+
+        string btn = calStep == 4 ? "FINISH" : "CAPTURE";
+        if (GUI.Button(new Rect(W * 0.2f, H - bh * 1.3f, W * 0.6f, bh), btn))
+        {
+            switch (calStep)
+            {
+                case 0: q0 = sensorNow; break;
+                case 1: q1 = sensorNow; break;
+                case 2: q2 = sensorNow; break;
+                case 3: q3 = sensorNow; break;
+                case 4: FinishCalibration(); calStep = -1; return;
+            }
+            calStep++;
+        }
+
+        if (GUI.Button(new Rect(W * 0.8f, 10, W * 0.16f, bh * 0.8f), "X"))
+        { calStep = -1; status = "Cal cancelled."; }
     }
 }
