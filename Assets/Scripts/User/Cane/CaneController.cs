@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // Cane orientation from MetaWear fused quaternion.
-// Working configuration (validated 2026-07): guided CAL wizard with ~180-degree
+// Working configuration : guided Calibration wizard with ~180-degree
 // motions, chirality FLIP toggle, persisted via PlayerPrefs.
 // This build adds READ: logs cane yaw/pitch relative to the last ZERO for the
 // floor validation protocol.
@@ -13,11 +13,9 @@ public class CaneController : MonoBehaviour
     [Header("Smoothing")]
     public float smoothSpeed = 20f;
 
-    // ---- calibration state (persisted) ----
-    private Quaternion axisMap = Quaternion.identity;
-    private int chirality = 1;
+    // calibration state         
 
-    // ---- runtime state ----
+    // runtime state
     private Quaternion sensorNow = Quaternion.identity;
     private Quaternion sensorRef = Quaternion.identity;
     private Quaternion caneRef = Quaternion.identity;
@@ -26,12 +24,13 @@ public class CaneController : MonoBehaviour
     private int readCount = 0;
     private string lastReading = "";
 
-    // ---- wizard state ----
+    //  wizard state 
     private int calStep = -1;
     private Quaternion q0, q1, q2, q3;
     private string status = "";
 
-    private static readonly string[] calMsgs = {
+    private static readonly string[] calMsgs = 
+    {
         "1/5  Hold FLAT, logo up,\nUSB toward you. Keep still.\nTap CAPTURE.",
         "2/5  Tip it NOSE-DOWN ~180\n(full half-turn forward).\nTap CAPTURE.",
         "3/5  Back to flat-forward, then\nSPIN RIGHT ~180 (stay flat).\nTap CAPTURE.",
