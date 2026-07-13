@@ -1,8 +1,10 @@
 using UnityEngine;
 
 // Cane orientation from MetaWear fused quaternion.
-// Guided 3-motion calibration measures the sensor->cane axis mapping;
-// FLIP toggles global rotation direction (chirality) and persists.
+// Working configuration (validated 2026-07): guided CAL wizard with ~180-degree
+// motions, chirality FLIP toggle, persisted via PlayerPrefs.
+// This build adds READ: logs cane yaw/pitch relative to the last ZERO for the
+// floor validation protocol.
 public class CaneController : MonoBehaviour
 {
     public HeightCalibration calibration;
@@ -21,6 +23,8 @@ public class CaneController : MonoBehaviour
     private Quaternion caneRef = Quaternion.identity;
     private bool hasData = false;
     private bool calibrated = false;
+    private int readCount = 0;
+    private string lastReading = "";
 
     // ---- wizard state ----
     private int calStep = -1;
@@ -28,10 +32,10 @@ public class CaneController : MonoBehaviour
     private string status = "";
 
     private static readonly string[] calMsgs = {
-        "1/5  Hold board FLAT, logo up,\nUSB toward you. Keep still.\nTap CAPTURE.",
-        "2/5  Tip it NOSE-DOWN 90\n(far edge to the floor).\nTap CAPTURE.",
-        "3/5  Back to flat-forward, then\nSPIN RIGHT 90 (stay flat).\nTap CAPTURE.",
-        "4/5  Back to flat-forward, then\nTWIST CLOCKWISE 90\n(roll it like a throttle).\nTap CAPTURE.",
+        "1/5  Hold FLAT, logo up,\nUSB toward you. Keep still.\nTap CAPTURE.",
+        "2/5  Tip it NOSE-DOWN ~180\n(full half-turn forward).\nTap CAPTURE.",
+        "3/5  Back to flat-forward, then\nSPIN RIGHT ~180 (stay flat).\nTap CAPTURE.",
+        "4/5  Back to flat-forward, then\nTWIST CLOCKWISE ~180.\nTap CAPTURE.",
         "5/5  Return to flat-forward.\nTap FINISH."
     };
 
@@ -76,6 +80,26 @@ public class CaneController : MonoBehaviour
         transform.position += gripBefore - gripPoint.position;
     }
 
+    // ---- validation reading: cane pose relative to last ZERO ----
+    private static float Wrap180(float a)
+    {
+        a %= 360f;
+        if (a > 180f) a -= 360f;
+        if (a < -180f) a += 360f;
+        return a;
+    }
+
+    private void TakeReading()
+    {
+        Quaternion rel = Quaternion.Inverse(caneRef) * transform.rotation;
+        Vector3 e = rel.eulerAngles;
+        float yaw = Wrap180(e.y);
+        float pitch = Wrap180(e.x);
+        readCount++;
+        lastReading = "#" + readCount + "  yaw " + yaw.ToString("F1") + "  pitch " + pitch.ToString("F1");
+        Debug.Log("[Reading] #" + readCount + " yaw: " + yaw.ToString("F1") + " pitch: " + pitch.ToString("F1") + " (rel. to last ZERO)");
+    }
+
     private static Vector3 DeltaAxis(Quaternion from, Quaternion to, out float angle)
     {
         Quaternion d = Quaternion.Inverse(from) * to;
@@ -90,7 +114,7 @@ public class CaneController : MonoBehaviour
         Vector3 aUp    = DeltaAxis(q0, q2, out float ang2);
         Vector3 aFwd   = DeltaAxis(q0, q3, out float ang3);
 
-        bool angleOk = ang1 > 45f && ang1 < 135f && ang2 > 45f && ang2 < 135f && ang3 > 45f && ang3 < 135f;
+        bool angleOk = ang1 > 45f && ang2 > 45f && ang3 > 45f;
 
         if (Vector3.Dot(Vector3.Cross(aRight, aUp), aFwd) < 0f)
         { chirality = -1; aRight = -aRight; aUp = -aUp; aFwd = -aFwd; }
@@ -109,7 +133,7 @@ public class CaneController : MonoBehaviour
         PlayerPrefs.SetInt("cane_chir", chirality);
         PlayerPrefs.Save();
 
-        status = (angleOk ? "Calibrated. " : "Calibrated (angles off - redo CAL if sloppy). ")
+        status = (angleOk ? "Calibrated. " : "Calibrated (small angles - redo CAL). ")
                  + "chir=" + chirality;
         Debug.Log("[CaneController] " + status);
         Recalibrate();
@@ -118,22 +142,27 @@ public class CaneController : MonoBehaviour
     void OnGUI()
     {
         float W = Screen.width, H = Screen.height;
-        float bh = H * 0.085f;
+        float bh = H * 0.08f;
         GUI.skin.button.fontSize = (int)(bh * 0.32f);
         GUI.skin.label.fontSize  = (int)(bh * 0.30f);
         GUI.skin.box.fontSize    = (int)(bh * 0.28f);
 
         if (calStep < 0)
         {
-            GUI.Box(new Rect(10, 10, W * 0.6f, bh * 0.7f), status);
+            GUI.Box(new Rect(10, 10, W * 0.62f, bh * 0.7f), status);
+            if (lastReading.Length > 0)
+                GUI.Box(new Rect(10, 14 + bh * 0.7f, W * 0.62f, bh * 0.7f), lastReading);
 
-            if (GUI.Button(new Rect(W * 0.04f, H - bh * 1.3f, W * 0.28f, bh), "ZERO"))
+            if (GUI.Button(new Rect(W * 0.03f, H - bh * 1.25f, W * 0.22f, bh), "ZERO"))
                 Recalibrate();
 
-            if (GUI.Button(new Rect(W * 0.36f, H - bh * 1.3f, W * 0.28f, bh), "CAL"))
+            if (GUI.Button(new Rect(W * 0.27f, H - bh * 1.25f, W * 0.22f, bh), "READ"))
+                TakeReading();
+
+            if (GUI.Button(new Rect(W * 0.51f, H - bh * 1.25f, W * 0.22f, bh), "CAL"))
                 calStep = 0;
 
-            if (GUI.Button(new Rect(W * 0.68f, H - bh * 1.3f, W * 0.28f, bh), "FLIP"))
+            if (GUI.Button(new Rect(W * 0.75f, H - bh * 1.25f, W * 0.22f, bh), "FLIP"))
             {
                 chirality = -chirality;
                 PlayerPrefs.SetInt("cane_chir", chirality);
@@ -147,7 +176,7 @@ public class CaneController : MonoBehaviour
         GUI.Box(new Rect(W * 0.05f, H * 0.25f, W * 0.9f, bh * 2.4f), calMsgs[calStep]);
 
         string btn = calStep == 4 ? "FINISH" : "CAPTURE";
-        if (GUI.Button(new Rect(W * 0.2f, H - bh * 1.3f, W * 0.6f, bh), btn))
+        if (GUI.Button(new Rect(W * 0.2f, H - bh * 1.25f, W * 0.6f, bh), btn))
         {
             switch (calStep)
             {
