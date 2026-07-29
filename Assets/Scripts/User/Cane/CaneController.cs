@@ -1,8 +1,10 @@
 using UnityEngine;
 
-// Cane orientation from MetaWear fused quaternion.
-// Hardened CAL wizard: live rotation feedback, capture guards, per-step redo.
-// ZERO = re-zero. FLIP = reverse all directions. READ = log yaw/pitch vs last ZERO.
+// Drives the virtual cane from the MetaWear fusion quaternion.
+// CAL = 5 step calibration wizard, run once per mount. ZERO = set forward, use constantly.
+// FLIP = reverse everything if directions come out mirrored. READ = print yaw/pitch for validation.
+// The flat spin is the anchor for the axis solve since gravity forces it vertical.
+// Tip arc only needs ~90 degrees, a full over-the-shoulder swing is awkward with a real cane.
 public class CaneController : MonoBehaviour
 {
     public HeightCalibration calibration;
@@ -11,11 +13,11 @@ public class CaneController : MonoBehaviour
     [Header("Smoothing")]
     public float smoothSpeed = 20f;
 
-    // ---- calibration state (persisted) ----
+    // saved to PlayerPrefs, survives relaunches. dies if the app gets deleted
     private Quaternion axisMap = Quaternion.identity;
     private int chirality = 1;
 
-    // ---- runtime state ----
+    // live state
     private Quaternion sensorNow = Quaternion.identity;
     private Quaternion sensorRef = Quaternion.identity;
     private Quaternion caneRef = Quaternion.identity;
@@ -25,29 +27,31 @@ public class CaneController : MonoBehaviour
     private int readCount = 0;
     private string lastReading = "";
 
-    // ---- wizard state ----
+    // wizard
     private int calStep = -1;
     private Quaternion q0, q1, q2, q3;
     private string status = "";
     private string calWarn = "";
 
-    private const float MinAngle = 120f;
+    // per step minimum rotation before CAPTURE unlocks. spin and roll stay strict
+    // since those are easy to do big, the tip arc floor is low for real cane range
+    private static readonly float[] stepMin = { 0f, 60f, 120f, 120f, 0f };
     private const float MaxAngle = 240f;
 
     private static readonly string[] calTitle = {
         "STEP 1 of 5 - START POSE",
-        "STEP 2 of 5 - TIP DOWN",
-        "STEP 3 of 5 - SPIN FLAT",
-        "STEP 4 of 5 - ROLL OVER",
+        "STEP 2 of 5 - TIP ARC",
+        "STEP 3 of 5 - FLAT SPIN",
+        "STEP 4 of 5 - SHAFT ROLL",
         "STEP 5 of 5 - FINISH"
     };
 
     private static readonly string[] calBody = {
-        "Hold the board FLAT, logo up,\nUSB port toward your belly.\nHold completely still, then tap CAPTURE.",
-        "Tip the NOSE (far edge) down and keep\ngoing until the board is nearly upside\ndown, nose pointing back at you.\nWatch the angle below - tap CAPTURE when GOOD.",
-        "Return to the start pose first.\nThen spin it flat like a record, to the\nright, about half a turn (USB ends up\npointing away from you). CAPTURE when GOOD.",
-        "Return to the start pose first.\nThen keep the nose aimed forward and\nroll the RIGHT edge down-and-under until\nthe logo faces the FLOOR. CAPTURE when GOOD.",
-        "Return to the start pose\n(flat, logo up, USB toward you).\nHold still and tap FINISH."
+        "Hold the cane in your normal grip,\ntip pointing forward and down.\nHold completely still, then tap CAPTURE.",
+        "Swing the TIP down until it points\nstraight at the floor - further if\nyou comfortably can.\nWatch the angle below - tap CAPTURE when GOOD.",
+        "Return to the start pose first.\nThen turn the cane's heading a flat\nhalf-turn (turn your body with it if\neasier). CAPTURE when GOOD.",
+        "Return to the start pose first.\nThen keep the tip aimed forward and\nROLL the shaft between your fingers,\nabout half a turn. CAPTURE when GOOD.",
+        "Return to the start pose\n(normal grip, tip forward-down).\nHold still and tap FINISH."
     };
 
     void Awake()
@@ -66,16 +70,19 @@ public class CaneController : MonoBehaviour
 
     public void ApplyQuaternion(float w, float x, float y, float z)
     {
+        // handedness swap, sensor is right handed and Unity is left handed
         sensorNow = new Quaternion(-x, -y, z, w);
         lastPacketTime = Time.realtimeSinceStartup;
         if (!hasData) { hasData = true; Recalibrate(); }
     }
 
+    // half a second without a packet means the board is dead or BLE dropped
     private bool SensorLive()
     {
         return Time.realtimeSinceStartup - lastPacketTime < 0.5f;
     }
 
+    // plants the flag: wherever the cane points right now becomes forward
     public void Recalibrate()
     {
         sensorRef = sensorNow;
@@ -87,17 +94,18 @@ public class CaneController : MonoBehaviour
     {
         if (!calibrated || calStep >= 0) return;
 
+        // rotation since the last ZERO, pushed through the measured axis map
         Quaternion delta = Quaternion.Inverse(sensorRef) * sensorNow;
         if (chirality < 0) delta = Quaternion.Inverse(delta);
         Quaternion corrected = axisMap * delta * Quaternion.Inverse(axisMap);
         Quaternion target = caneRef * corrected;
 
+        // rotate around the grip, not the object origin
         Vector3 gripBefore = gripPoint.position;
         transform.rotation = Quaternion.Slerp(transform.rotation, target, smoothSpeed * Time.deltaTime);
         transform.position += gripBefore - gripPoint.position;
     }
 
-    // ---- validation reading ----
     private static float Wrap180(float a)
     {
         a %= 360f;
@@ -106,6 +114,7 @@ public class CaneController : MonoBehaviour
         return a;
     }
 
+    // one data point for the floor validation. prints to Xcode console and the screen
     private void TakeReading()
     {
         Quaternion rel = Quaternion.Inverse(caneRef) * transform.rotation;
@@ -117,7 +126,7 @@ public class CaneController : MonoBehaviour
         Debug.Log("[Reading] #" + readCount + " yaw: " + yaw.ToString("F1") + " pitch: " + pitch.ToString("F1") + " (rel. to last ZERO)");
     }
 
-    // ---- calibration math ----
+    // axis and angle of the rotation between two captured poses
     private static Vector3 DeltaAxis(Quaternion from, Quaternion to, out float angle)
     {
         Quaternion d = Quaternion.Inverse(from) * to;
@@ -133,30 +142,34 @@ public class CaneController : MonoBehaviour
 
     private void FinishCalibration()
     {
-        Vector3 aRight = DeltaAxis(q0, q1, out float ang1);
-        Vector3 aUp    = DeltaAxis(q0, q2, out float ang2);
-        Vector3 aFwd   = DeltaAxis(q0, q3, out float ang3);
+        // each captured motion defines one cane axis
+        Vector3 aRight = DeltaAxis(q0, q1, out float ang1);   // tip arc = pitch
+        Vector3 aUp    = DeltaAxis(q0, q2, out float ang2);   // flat spin = yaw
+        Vector3 aFwd   = DeltaAxis(q0, q3, out float ang3);   // shaft roll = roll
 
-        if (ang1 < MinAngle || ang2 < MinAngle || ang3 < MinAngle)
+        if (ang1 < stepMin[1] || ang2 < stepMin[2] || ang3 < stepMin[3])
         {
             calWarn = "A motion was too small (" + ang1.ToString("F0") + "/" + ang2.ToString("F0") + "/" + ang3.ToString("F0") +
                       " deg). Use BACK to redo the small one.";
             return;
         }
+        // if two motions rotated the same way the frame is garbage, bail out
         if (Mathf.Abs(Vector3.Dot(aRight, aUp)) > 0.7f ||
             Mathf.Abs(Vector3.Dot(aRight, aFwd)) > 0.7f ||
             Mathf.Abs(Vector3.Dot(aUp, aFwd)) > 0.7f)
         {
-            calWarn = "Two motions were too similar - the tip, spin, and roll must each rotate a different way. Redo CAL.";
+            calWarn = "Two motions were too similar - the tip arc, flat spin, and shaft roll must each rotate a different way. Redo CAL.";
             return;
         }
 
+        // handedness check, auto flips if the board is wired the other way
         if (Vector3.Dot(Vector3.Cross(aRight, aUp), aFwd) < 0f)
         { chirality = -1; aRight = -aRight; aUp = -aUp; aFwd = -aFwd; }
         else chirality = 1;
 
-        Vector3 r = aRight.normalized;
-        Vector3 u = (aUp - Vector3.Dot(aUp, r) * r).normalized;
+        // spin axis is trusted, gravity keeps it honest. project its error out of the tip arc
+        Vector3 u = aUp.normalized;
+        Vector3 r = (aRight - Vector3.Dot(aRight, u) * u).normalized;
         Vector3 f = Vector3.Cross(r, u);
 
         axisMap = Quaternion.Inverse(Quaternion.LookRotation(f, u));
@@ -183,6 +196,7 @@ public class CaneController : MonoBehaviour
         GUI.skin.label.fontSize  = (int)(bh * 0.30f);
         GUI.skin.box.fontSize    = (int)(bh * 0.26f);
 
+        // main screen
         if (calStep < 0)
         {
             GUI.Box(new Rect(10, 10, W * 0.62f, bh * 0.7f), status);
@@ -208,7 +222,7 @@ public class CaneController : MonoBehaviour
             return;
         }
 
-        // ---- wizard UI ----
+        // wizard screen
         GUI.Box(new Rect(W * 0.05f, H * 0.16f, W * 0.9f, bh * 0.8f), calTitle[calStep]);
         GUI.Box(new Rect(W * 0.05f, H * 0.16f + bh * 0.9f, W * 0.9f, bh * 2.6f), calBody[calStep]);
 
@@ -223,14 +237,17 @@ public class CaneController : MonoBehaviour
         }
         else if (calStep == 0 || calStep == 4)
         {
+            // still poses, nothing to measure, just need live data
             gate = "Sensor OK - hold still";
             canCapture = true;
         }
         else
         {
+            // motion steps show live rotation so nobody has to guess the angle
             float a = LiveAngleFromStart();
-            bool inBand = a >= MinAngle && a <= MaxAngle;
-            gate = "Rotated: " + a.ToString("F0") + " deg  " + (inBand ? "- GOOD, tap CAPTURE" : "- keep going (need " + (int)MinAngle + "-" + (int)MaxAngle + ")");
+            float need = stepMin[calStep];
+            bool inBand = a >= need && a <= MaxAngle;
+            gate = "Rotated: " + a.ToString("F0") + " deg  " + (inBand ? "- GOOD, tap CAPTURE" : "- keep going (need " + (int)need + "+)");
             canCapture = inBand;
         }
 
