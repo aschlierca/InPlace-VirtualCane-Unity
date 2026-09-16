@@ -161,14 +161,11 @@ Unity (C# App - iOS Target)
 
 ### MetaWear
 
-Sensor Info: https://mbientlab.com/tutorials/MetaMotionRL.html . .
-
-Sample MetaWear iOS repo: https://github.com/mbientlab/MetaWear-SDK-iOS-macOS-tvOS . .
-
-Sample MetaWear app: https://mbientlab.com/tutorials/MetaWearApp.html . .
-
-MetaWear Swift API: https://mbientlab.com/iosdocs/latest/ . .
+Sensor Info: https://mbientlab.com/tutorials/MetaMotionRL.html  
+Sample MetaWear iOS repo: https://github.com/mbientlab/MetaWear-SDK-iOS-macOS-tvOS  
+Sample MetaWear app: https://mbientlab.com/tutorials/MetaWearApp.html  
+MetaWear Swift API: https://mbientlab.com/iosdocs/latest/
 
 ### Unity
 
-Airpods: https://assetstore.unity.com/packages/tools/integration/headphone-motion-179629 . .
+Airpods: https://assetstore.unity.com/packages/tools/integration/headphone-motion-179629
