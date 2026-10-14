@@ -52,7 +52,9 @@ public class PostBuildSetup
         root.SetString("NSBluetoothAlwaysUsageDescription", "This app uses Bluetooth to connect to MetaWear sensors.");
         root.SetString("NSBluetoothPeripheralUsageDescription", "This app uses Bluetooth to communicate with external sensors.");
         root.SetString("NSCameraUsageDescription", "This app uses motion data to track steps and device movement.");
-        root.SetString("NSMotionUsageDescription", "");
+        // Must be non-empty: iOS treats an empty string as missing and crashes when the
+        // HeadphoneMotion plugin (AirPods head tracking) or step detection requests motion access.
+        root.SetString("NSMotionUsageDescription", "This app uses motion data from your AirPods to track which way your head is facing, and from your iPhone to detect your steps.");
 
         // --- Background modes ---
         // Required by CoreBluetooth state restoration (MetaWearScanner.sharedRestore).
