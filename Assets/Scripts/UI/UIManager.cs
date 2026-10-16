@@ -82,19 +82,19 @@ public class UIManager : MonoBehaviour
     public void LoadBlueRoom()
     {
         // Replace "ExplorationPart" with your actual Blue Room scene name
-        SceneManager.LoadScene("BlueRoom");
+        SceneManager.LoadScene("ExplorationPart");
     }
 
     public void LoadGreenRoom()
     {
         // Replace "ExplorationPartV2" with your actual Green Room scene name
-        SceneManager.LoadScene("GreenRoom");
+        SceneManager.LoadScene("ExplorationPartV2");
     }
 
     public void LoadRedRoom()
     {
         // Replace "ExplorationPartV3" with your actual Red Room scene name
-        SceneManager.LoadScene("RedRoom");
+        SceneManager.LoadScene("ExplorationPartV3");
     }
 
     public void LoadMainMenu()
