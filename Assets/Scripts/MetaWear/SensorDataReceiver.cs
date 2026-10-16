@@ -2,6 +2,17 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 using TMPro;
 
+// Quaternion packet from the on-board sensor fusion module.
+[System.Serializable]
+public class QuaternionPacket
+{
+    public long epoch;
+    public float qw;
+    public float qx;
+    public float qy;
+    public float qz;
+}
+
 public class SensorDataReceiver : MonoBehaviour
 {
     public CaneController caneController;
@@ -13,6 +24,7 @@ public class SensorDataReceiver : MonoBehaviour
     private bool isConnected = false;
     private float lastDataTime = 0f;
     private int packetCount = 0;
+    private int quatCount = 0;
 
 #if UNITY_IOS && !UNITY_EDITOR
     [DllImport("__Internal")]
@@ -39,16 +51,14 @@ public class SensorDataReceiver : MonoBehaviour
         Debug.Log("SensorDataReceiver started");
         UpdateDebugText("Waiting to start scan...");
 
-        // Auto-start scanning after a short delay
         Invoke("StartScanning", 1f);
     }
 
     void Update()
     {
-        // Check for data timeout (no data received for 3 seconds while connected)
         if (isConnected && Time.time - lastDataTime > 3f && lastDataTime > 0)
         {
-            UpdateDebugText($"No data for {Time.time - lastDataTime:F1}s\nPackets: {packetCount}");
+            UpdateDebugText($"No data for {Time.time - lastDataTime:F1}s\nQuat packets: {quatCount}");
         }
     }
 
@@ -67,8 +77,6 @@ public class SensorDataReceiver : MonoBehaviour
 
     public void StopScanning()
     {
-        Debug.Log("Unity: Stopping MetaWear scan...");
-
 #if UNITY_IOS && !UNITY_EDITOR
         MetaWear_StopScan();
 #endif
@@ -76,8 +84,6 @@ public class SensorDataReceiver : MonoBehaviour
 
     public void StartStreaming()
     {
-        Debug.Log("Unity: Starting streaming...");
-
 #if UNITY_IOS && !UNITY_EDITOR
         MetaWear_StartStreaming();
 #endif
@@ -85,8 +91,6 @@ public class SensorDataReceiver : MonoBehaviour
 
     public void StopStreaming()
     {
-        Debug.Log("Unity: Stopping streaming...");
-
 #if UNITY_IOS && !UNITY_EDITOR
         MetaWear_StopStreaming();
 #endif
@@ -94,8 +98,6 @@ public class SensorDataReceiver : MonoBehaviour
 
     public void DisconnectDevice()
     {
-        Debug.Log("Unity: Disconnecting device...");
-
 #if UNITY_IOS && !UNITY_EDITOR
         MetaWear_Disconnect();
 #endif
@@ -103,49 +105,56 @@ public class SensorDataReceiver : MonoBehaviour
 
     public void SetUserHeight(float heightCm)
     {
-        Debug.Log($"Unity: Setting user height to {heightCm}cm");
-
 #if UNITY_IOS && !UNITY_EDITOR
         MetaWear_SetUserHeight(heightCm);
 #endif
     }
 
-    /// <summary>
-    /// Called from iOS native code when sensor data is received
-    /// </summary>
+    // Called from iOS native code with the fused orientation quaternion.
+    // THIS is what drives the cane now.
+    public void OnQuaternionData(string json)
+    {
+        try
+        {
+            QuaternionPacket q = JsonUtility.FromJson<QuaternionPacket>(json);
+
+            if (caneController != null)
+                caneController.ApplyQuaternion(q.qw, q.qx, q.qy, q.qz);
+
+            lastDataTime = Time.time;
+            quatCount++;
+
+            if (quatCount % 100 == 0)
+            {
+                UpdateDebugText($"Fusion streaming\nQuat packets: {quatCount}\nq: ({q.qw:F2}, {q.qx:F2}, {q.qy:F2}, {q.qz:F2})");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Error parsing quaternion data: {e.Message}\nJSON: {json}");
+        }
+    }
+
+    // Called from iOS native code with fusion-corrected accel/gyro.
+    // Logger/graph only — the cane is NOT driven from this anymore.
     public void OnSensorData(string json)
     {
         try
         {
             SensorPacket p = JsonUtility.FromJson<SensorPacket>(json);
 
-            // Update components
-            if (caneController != null)
-                caneController.ApplySensorData(p);
-
             if (logger != null)
                 logger.Log(p);
 
-            // Track data reception
-            lastDataTime = Time.time;
             packetCount++;
-
-            // Update debug info periodically
-            if (packetCount % 100 == 0)
-            {
-                UpdateDebugText($"Receiving data\nPackets: {packetCount}\nAccel: ({p.ax:F2}, {p.ay:F2}, {p.az:F2})\nGyro: ({p.gx:F2}, {p.gy:F2}, {p.gz:F2})");
-            }
         }
         catch (System.Exception e)
         {
             Debug.LogError($"Error parsing sensor data: {e.Message}\nJSON: {json}");
-            UpdateDebugText($"Error parsing data:\n{e.Message}");
         }
     }
 
-    /// <summary>
-    /// Called from iOS native code when connection status changes
-    /// </summary>
+    // Called from iOS native code when connection status changes
     public void OnConnectionStatus(string status)
     {
         Debug.Log($"Unity: Connection status changed to '{status}'");
@@ -164,6 +173,7 @@ public class SensorDataReceiver : MonoBehaviour
     {
         isConnected = true;
         packetCount = 0;
+        quatCount = 0;
         lastDataTime = Time.time;
 
         if (statusText != null)
@@ -173,7 +183,6 @@ public class SensorDataReceiver : MonoBehaviour
         }
 
         UpdateDebugText("Connected!\nWaiting for data...");
-        Debug.Log("Unity: MetaWear connected");
     }
 
     public void SetDisconnected()
@@ -186,8 +195,7 @@ public class SensorDataReceiver : MonoBehaviour
             statusText.color = Color.red;
         }
 
-        UpdateDebugText($"Disconnected\nLast packet count: {packetCount}");
-        Debug.Log("Unity: MetaWear disconnected");
+        UpdateDebugText($"Disconnected\nQuat packets: {quatCount}");
     }
 
     private void UpdateDebugText(string message)
@@ -200,18 +208,14 @@ public class SensorDataReceiver : MonoBehaviour
     }
 
     // UI Button callbacks
-    public void OnScanButtonPressed()
-    {
-        StartScanning();
-    }
+    public void OnScanButtonPressed() => StartScanning();
+    public void OnStopScanButtonPressed() => StopScanning();
+    public void OnDisconnectButtonPressed() => DisconnectDevice();
 
-    public void OnStopScanButtonPressed()
+    // Wire this to a "Zero Cane" UI button.
+    public void OnRecalibrateButtonPressed()
     {
-        StopScanning();
-    }
-
-    public void OnDisconnectButtonPressed()
-    {
-        DisconnectDevice();
+        if (caneController != null)
+            caneController.Recalibrate();
     }
 }
