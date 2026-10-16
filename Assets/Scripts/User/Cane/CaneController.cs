@@ -13,7 +13,9 @@ public class CaneController : MonoBehaviour
     [Header("Smoothing")]
     public float smoothSpeed = 20f;
 
-    // calibration state         
+    // calibration state (persisted)
+    private Quaternion axisMap = Quaternion.identity;
+    private int chirality = 1;
 
     // runtime state
     private Quaternion sensorNow = Quaternion.identity;
