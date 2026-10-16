@@ -7,7 +7,8 @@ using UnityEngine.UI;
 // place) and a top-down camera view of the user fills the freed space between
 // the buttons and the room view. The state persists across scenes via PlayerPrefs.
 // The switch has no audio/haptics and no UAP accessible component, so it stays
-// out of the VoiceOver navigation order.
+// out of the VoiceOver navigation order. It has its own Canvas (sort order 1001)
+// so direct taps reach it above UAP's full-screen touch blocker (order 1000).
 public class DeveloperMode : MonoBehaviour
 {
     [Header("Switch")]
