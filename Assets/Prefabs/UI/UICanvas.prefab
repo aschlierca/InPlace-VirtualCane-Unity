@@ -462,6 +462,7 @@ GameObject:
   - component: {fileID: 1200761363716064698}
   - component: {fileID: 4224568172684686768}
   - component: {fileID: 1264538832764960320}
+  - component: {fileID: 5398021746113950217}
   m_Layer: 5
   m_Name: UICanvas
   m_TagString: Untagged
@@ -11001,3 +11002,28 @@ MonoBehaviour:
   m_CallbackOnHighlight:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &5398021746113950217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 229667303440283928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1823f190bedf4804978de3f0da01d001, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  switchParent: {fileID: 5464424282982684544}
+  stepsButtons: {fileID: 1982761261159532007}
+  stepButtons:
+  - {fileID: 8813707224831328321}
+  - {fileID: 8977256940604748715}
+  homePanel: {fileID: 6603600218217279630}
+  roomView: {fileID: 7856023404606455559}
+  devButtonHeight: 400
+  viewGap: 20
+  user: {fileID: 0}
+  cameraHeight: 10
+  viewHalfHeight: 2.5
+  rotateWithUser: 1
