@@ -24,13 +24,13 @@ public class DeveloperMode : MonoBehaviour
     public RectTransform roomView;         // VirtualRoomRawImage
 
     [Header("Developer layout")]
-    public float devButtonHeight = 300f;
+    public float devButtonHeight = 200f;
     public float viewGap = 20f;
 
     [Header("Top-down camera")]
     public Transform user;                 // defaults to StepCount.player
-    public float cameraHeight = 10f;
-    public float viewHalfHeight = 1.75f;   // metres visible above/below the user
+    public float cameraHeight = 5f;
+    public float viewHalfHeight =1.75f;   // metres visible above/below the user
     public bool rotateWithUser = true;     // user's forward points up on screen
 
     private const string PrefKey = "DeveloperMode";

@@ -1698,6 +1698,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 1774594937}
+    - target: {fileID: 5748187009284663679, guid: c71a40ed564b940bda03f35100fa22bd, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -107
+      objectReference: {fileID: 0}
     - target: {fileID: 6092008836828789514, guid: c71a40ed564b940bda03f35100fa22bd, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -1970,13 +1974,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   head: {fileID: 3484378107074097453}
   recenterOnConnect: 1
-  baseLocalRotation: {x: 0, y: 0, z: 0, w: 0}
-  yawOffset: {x: 0, y: 0, z: 0, w: 1}
-  latestRotation: {x: 0, y: 0, z: 0, w: 1}
-  hasSample: 0
-  headphonesConnected: 0
-  recenterPending: 0
-  tracking: 0
 --- !u!4 &3484378107074097453 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3829219949502992153, guid: 6b8b5b52ae3474ed28d532caf1b57c78, type: 3}
@@ -1996,13 +1993,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   head: {fileID: 3484378107074097453}
   recenterOnConnect: 1
-  baseLocalRotation: {x: 0, y: 0, z: 0, w: 0}
-  yawOffset: {x: 0, y: 0, z: 0, w: 1}
-  latestRotation: {x: 0, y: 0, z: 0, w: 1}
-  hasSample: 0
-  headphonesConnected: 0
-  recenterPending: 0
-  tracking: 0
 --- !u!1001 &4259319595594152198
 PrefabInstance:
   m_ObjectHideFlags: 0
