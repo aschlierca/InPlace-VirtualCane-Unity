@@ -11024,11 +11024,11 @@ MonoBehaviour:
   - {fileID: 8977256940604748715}
   homePanel: {fileID: 6603600218217279630}
   roomView: {fileID: 7856023404606455559}
-  devButtonHeight: 400
+  devButtonHeight: 300
   viewGap: 20
   user: {fileID: 0}
   cameraHeight: 10
-  viewHalfHeight: 2.5
+  viewHalfHeight: 1.75
   rotateWithUser: 1
 --- !u!1 &7716812763951688203
 GameObject:
