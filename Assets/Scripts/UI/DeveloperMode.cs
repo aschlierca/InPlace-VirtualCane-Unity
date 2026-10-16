@@ -6,14 +6,16 @@ using UnityEngine.UI;
 // When on: the step add/subtract buttons are shortened (bottom edge kept in
 // place) and a top-down camera view of the user fills the freed space between
 // the buttons and the room view. The state persists across scenes via PlayerPrefs.
-// The switch has no audio/haptics and no UAP accessible component, so it stays
-// out of the VoiceOver navigation order. It has its own Canvas (sort order 1001)
-// so direct taps reach it above UAP's full-screen touch blocker (order 1000).
+// The switch is a UAP AccessibleButton: VoiceOver/UAP reads it as
+// "Developer mode, on/off" and announces the new state when toggled.
+// It has its own Canvas (sort order 1001) so direct taps also reach it above
+// UAP's full-screen touch blocker (order 1000).
 public class DeveloperMode : MonoBehaviour
 {
     [Header("Switch")]
     public Image switchTrack;              // DeveloperModeSwitch background
     public RectTransform switchKnob;       // DeveloperModeSwitch/Knob
+    public AccessibleButton switchAccessible;
 
     [Header("UI (found by name under this canvas if empty)")]
     public RectTransform stepsButtons;     // StepsButtons layout group
@@ -54,7 +56,12 @@ public class DeveloperMode : MonoBehaviour
         SetDeveloperMode(PlayerPrefs.GetInt(PrefKey, 0) == 1);
     }
 
-    public void ToggleDeveloperMode() => SetDeveloperMode(!devOn);
+    public void ToggleDeveloperMode()
+    {
+        SetDeveloperMode(!devOn);
+        // Same direct, interrupting speech path StepCount uses for step counts
+        UAP_AccessibilityManager.Say(StateText(), true, false, UAP_AudioQueue.EInterrupt.All);
+    }
 
     public void SetDeveloperMode(bool on)
     {
@@ -176,11 +183,14 @@ public class DeveloperMode : MonoBehaviour
     private void UpdateSwitchVisual()
     {
         if (switchTrack != null) switchTrack.color = devOn ? OnColor : OffColor;
+        if (switchAccessible != null) switchAccessible.SetCustomText(StateText());
         if (switchKnob == null) return;
         float x = devOn ? 1f : 0f;
         switchKnob.anchorMin = switchKnob.anchorMax = switchKnob.pivot = new Vector2(x, 0.5f);
         switchKnob.anchoredPosition = new Vector2(devOn ? -6f : 6f, 0f);
     }
+
+    private string StateText() => devOn ? "Developer mode, on" : "Developer mode, off";
 
     // ---- helpers ----
 
