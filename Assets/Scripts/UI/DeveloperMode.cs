@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-// Developer mode, toggled by the DeveloperModeSwitch button in the top-right
-// corner of GlobalUI (its OnClick calls ToggleDeveloperMode).
+// Developer mode, toggled by the DeveloperModeSwitch button in the Settings tab
+// (SettingsLayout/DeveloperMode row; its OnClick calls ToggleDeveloperMode).
 // When on: the step add/subtract buttons are shortened (bottom edge kept in
 // place) and a top-down camera view of the user fills the freed space between
 // the buttons and the room view. The state persists across scenes via PlayerPrefs.
@@ -186,8 +186,9 @@ public class DeveloperMode : MonoBehaviour
         if (switchAccessible != null) switchAccessible.SetCustomText(StateText());
         if (switchKnob == null) return;
         float x = devOn ? 1f : 0f;
+        float margin = (((RectTransform)switchKnob.parent).rect.height - switchKnob.rect.height) * 0.5f;
         switchKnob.anchorMin = switchKnob.anchorMax = switchKnob.pivot = new Vector2(x, 0.5f);
-        switchKnob.anchoredPosition = new Vector2(devOn ? -6f : 6f, 0f);
+        switchKnob.anchoredPosition = new Vector2(devOn ? -margin : margin, 0f);
     }
 
     private string StateText() => devOn ? "Developer mode, on" : "Developer mode, off";
