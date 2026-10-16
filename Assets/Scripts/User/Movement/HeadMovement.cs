@@ -5,6 +5,8 @@ public class HeadMovement : MonoBehaviour
     public Transform playerBody; // Parent capsule for horizontal rotation
     public float mouseSensitivity = 2f;
     public float touchSensitivity = 0.2f;
+    [Tooltip("On iOS, AirPods head tracking turns the view; touch-drag look is off unless this is set")]
+    public bool touchLookOnIOS = false;
 
     private float xRotation = 0f; // Vertical rotation
     private float yRotation = 0f; // Horizontal rotation
@@ -20,7 +22,7 @@ public class HeadMovement : MonoBehaviour
 #if UNITY_EDITOR
         HandleMouseLook();
 #elif UNITY_IOS
-        HandleTouchLook();
+        if (touchLookOnIOS) HandleTouchLook();
 #endif
     }
 
