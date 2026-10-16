@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
-// Developer mode, toggled by a small switch in the top-right corner.
+// Developer mode, toggled by the DeveloperModeSwitch button in the top-right
+// corner of GlobalUI (its OnClick calls ToggleDeveloperMode).
 // When on: the step add/subtract buttons are shortened (bottom edge kept in
 // place) and a top-down camera view of the user fills the freed space between
 // the buttons and the room view. The state persists across scenes via PlayerPrefs.
@@ -10,8 +10,11 @@ using TMPro;
 // out of the VoiceOver navigation order.
 public class DeveloperMode : MonoBehaviour
 {
+    [Header("Switch")]
+    public Image switchTrack;              // DeveloperModeSwitch background
+    public RectTransform switchKnob;       // DeveloperModeSwitch/Knob
+
     [Header("UI (found by name under this canvas if empty)")]
-    public RectTransform switchParent;     // GlobalUI
     public RectTransform stepsButtons;     // StepsButtons layout group
     public RectTransform[] stepButtons;    // AddSteps, SubtractSteps
     public RectTransform homePanel;
@@ -30,13 +33,10 @@ public class DeveloperMode : MonoBehaviour
     private const string PrefKey = "DeveloperMode";
     private static readonly Color OnColor = new Color(0.20f, 0.75f, 0.35f);
     private static readonly Color OffColor = new Color(0.55f, 0.55f, 0.55f);
-    private static Sprite circleSprite;
 
     private bool devOn;
     private Vector2[] normalSizes;
     private Vector2 normalGroupPos;
-    private Image switchTrack;
-    private RectTransform switchKnob;
     private RawImage topDownImage;
     private Camera topDownCam;
     private RenderTexture topDownRT;
@@ -50,9 +50,10 @@ public class DeveloperMode : MonoBehaviour
         for (int i = 0; i < stepButtons.Length; i++)
             normalSizes[i] = stepButtons[i].sizeDelta;
 
-        BuildSwitch();
         SetDeveloperMode(PlayerPrefs.GetInt(PrefKey, 0) == 1);
     }
+
+    public void ToggleDeveloperMode() => SetDeveloperMode(!devOn);
 
     public void SetDeveloperMode(bool on)
     {
@@ -171,86 +172,19 @@ public class DeveloperMode : MonoBehaviour
 
     // ---- switch ----
 
-    private void BuildSwitch()
-    {
-        if (switchParent == null) return;
-
-        var root = new GameObject("DeveloperModeSwitch", typeof(RectTransform), typeof(Image), typeof(Button));
-        root.transform.SetParent(switchParent, false);
-        root.transform.SetAsLastSibling();
-        var rt = (RectTransform)root.transform;
-        rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(1f, 1f);
-        rt.anchoredPosition = new Vector2(-20f, -20f);
-        rt.sizeDelta = new Vector2(140f, 72f);
-
-        switchTrack = root.GetComponent<Image>();
-        switchTrack.sprite = CircleSprite();
-        switchTrack.type = Image.Type.Sliced;
-        switchTrack.pixelsPerUnitMultiplier = (CircleSprite().border.x) / (rt.sizeDelta.y * 0.5f);
-        root.GetComponent<Button>().onClick.AddListener(() => SetDeveloperMode(!devOn));
-
-        var knob = new GameObject("Knob", typeof(RectTransform), typeof(Image));
-        knob.transform.SetParent(root.transform, false);
-        switchKnob = (RectTransform)knob.transform;
-        switchKnob.sizeDelta = new Vector2(60f, 60f);
-        var knobImage = knob.GetComponent<Image>();
-        knobImage.sprite = CircleSprite();
-        knobImage.raycastTarget = false;
-
-        var label = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
-        label.transform.SetParent(root.transform, false);
-        var lrt = (RectTransform)label.transform;
-        lrt.anchorMin = lrt.anchorMax = new Vector2(0f, 0.5f);
-        lrt.pivot = new Vector2(1f, 0.5f);
-        lrt.anchoredPosition = new Vector2(-12f, 0f);
-        lrt.sizeDelta = new Vector2(120f, 72f);
-        var text = label.GetComponent<TextMeshProUGUI>();
-        text.text = "DEV";
-        text.fontSize = 34;
-        text.alignment = TextAlignmentOptions.MidlineRight;
-        text.raycastTarget = false;
-    }
-
     private void UpdateSwitchVisual()
     {
-        if (switchTrack == null) return;
-        switchTrack.color = devOn ? OnColor : OffColor;
+        if (switchTrack != null) switchTrack.color = devOn ? OnColor : OffColor;
+        if (switchKnob == null) return;
         float x = devOn ? 1f : 0f;
         switchKnob.anchorMin = switchKnob.anchorMax = switchKnob.pivot = new Vector2(x, 0.5f);
         switchKnob.anchoredPosition = new Vector2(devOn ? -6f : 6f, 0f);
-    }
-
-    // White anti-aliased circle; sliced, it also draws the switch's pill track.
-    private static Sprite CircleSprite()
-    {
-        if (circleSprite != null) return circleSprite;
-        const int size = 64;
-        float r = size * 0.5f;
-        var tex = new Texture2D(size, size, TextureFormat.RGBA32, false)
-        {
-            filterMode = FilterMode.Bilinear,
-            wrapMode = TextureWrapMode.Clamp
-        };
-        var px = new Color32[size * size];
-        for (int y = 0; y < size; y++)
-            for (int x = 0; x < size; x++)
-            {
-                float d = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(r, r));
-                px[y * size + x] = new Color32(255, 255, 255, (byte)(Mathf.Clamp01(r - d) * 255));
-            }
-        tex.SetPixels32(px);
-        tex.Apply();
-        float b = r - 1f;
-        circleSprite = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f),
-                                     100f, 0, SpriteMeshType.FullRect, new Vector4(b, b, b, b));
-        return circleSprite;
     }
 
     // ---- helpers ----
 
     private void ResolveReferences()
     {
-        if (switchParent == null) switchParent = FindRect("GlobalUI");
         if (stepsButtons == null) stepsButtons = FindRect("StepsButtons");
         if (homePanel == null) homePanel = FindRect("HomePanel");
         if (roomView == null) roomView = FindRect("VirtualRoomRawImage");
