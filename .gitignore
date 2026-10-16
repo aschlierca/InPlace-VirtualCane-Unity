@@ -78,5 +78,6 @@ crashlytics-build.properties
 # Firebase/Google plist
 /Assets/GoogleService-Info.plist
 
-CLAUDE.mdios-build/
+CLAUDE.md
+ios-build/
 ios-build*/
